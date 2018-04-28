@@ -9,7 +9,7 @@ steps:
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=10.0.0 --tag=test:10.0.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT --file=Dockerfile .']
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=10.0.0 --tag=test:10.0.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT --file=test/Dockerfile .']
     secretEnv: ['GITHUB_PAT']
   - name: 'test:10.0.0'
 images: 
