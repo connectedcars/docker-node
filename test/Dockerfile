@@ -11,6 +11,10 @@ COPY . /app
 
 RUN ls -l
 
+RUN node -v
+RUN npm -v
+RUN yarn -v
+
 RUN npm install
 
 RUN npm test
