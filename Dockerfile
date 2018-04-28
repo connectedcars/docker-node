@@ -95,7 +95,7 @@ FROM ubuntu:18.04 as builder
 ARG NODE_VERSION
 ARG YARN_VERSION
 
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential python
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential python git
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local

@@ -1,15 +1,15 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=10.0.0 --tag=gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.0.0 --tag=gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.0.0 --build-arg=YARN_VERSION=1.6.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT --file=Dockerfile .']
+    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=10.0.0 --tag=gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.0.0 --tag=gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.0.0 --build-arg=YARN_VERSION=1.6.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=10.0.0 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.0.0 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.0.0 --build-arg=YARN_VERSION=1.6.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT --file=Dockerfile .']
+    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=10.0.0 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.0.0 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.0.0 --build-arg=YARN_VERSION=1.6.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', '(cd test && docker build --build-arg=NODE_VERSION=10.0.0 --tag=test:10.0.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT --file=Dockerfile .)']
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=10.0.0 --tag=test:10.0.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT test/']
     secretEnv: ['GITHUB_PAT']
   - name: 'test:10.0.0'
 images: 
