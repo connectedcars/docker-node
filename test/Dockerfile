@@ -9,6 +9,8 @@ WORKDIR /app
 # Copy application code.
 COPY . /app
 
+RUN ls -l
+
 RUN npm install
 
 RUN npm test
