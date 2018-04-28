@@ -1,0 +1,8 @@
+
+# package-auth
+
+```
+node index.js rewrite MYTOKEN ./package.json
+npm install
+node index.js revert ./package.json
+```

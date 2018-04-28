@@ -1,0 +1,19 @@
+{
+  "name": "hello_world",
+  "version": "0.0.1",
+  "description": "Hello world module import sample",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "test": "NODE_ENV=test mocha test"
+  },
+  "author": "Troels Liebe Bentsen <troels@connectedcars.dk>",
+  "dependencies": {
+    "private-module": "git+ssh://git@github.com/connectedcars/private-module.git"
+  },
+  "devDependencies": {
+    "mocha": "3.1.2",
+    "chai": "3.5.0"
+  },
+  "license": "MIT"
+}

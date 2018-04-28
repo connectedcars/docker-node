@@ -1,0 +1,16 @@
+#!/bin/bash
+set -eu -o pipefail
+
+GITHUB_PAT=${GITHUB_PAT:-}
+
+if [[ -n "$GITHUB_PAT" ]]; then
+    echo "Rewrite github git+ssh references and inject personal access token"
+    node /opt/connectedcars/package-auth/index.js rewrite $GITHUB_PAT $PWD/package.json
+fi
+
+/usr/local/bin/yarn $@
+
+if [[ -n "$GITHUB_PAT" ]]; then
+    echo "Reverting changes"
+    node /opt/connectedcars/package-auth/index.js revert $GITHUB_PAT $PWD/package.json
+fi

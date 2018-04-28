@@ -1,0 +1,21 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=10.0.0 --tag=gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.0.0 --tag=gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.0.0 --build-arg=YARN_VERSION=1.6.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT --file=Dockerfile .']
+    secretEnv: ['GITHUB_PAT']
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=10.0.0 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.0.0 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.0.0 --build-arg=YARN_VERSION=1.6.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT --file=Dockerfile .']
+    secretEnv: ['GITHUB_PAT']
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=10.0.0 --tag=test:10.0.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT --file=Dockerfile .']
+    secretEnv: ['GITHUB_PAT']
+  - name: 'test:10.0.0'
+images: 
+  - 'gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.0.0'
+  - 'gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.0.0'
+secrets:
+- kmsKeyName: projects/connectedcars-staging/locations/global/keyRings/cloudbuilder/cryptoKeys/connectedcars-builder
+  secretEnv:
+    GITHUB_PAT: CiQAg7wCPfO2Tf9mtZoFWjAtX7whQ481af3gyGdM9WNK26B74UkSUQBefMgeHNh0KTsGybKReXDsFcbmed7f5sw97zSe9cswpKogENM5Ye0jiIu6NfebUpCnmJ9HVHmD/yBknlW4nn1VXBs7HYGiBSFZ52i2HyEopw==
