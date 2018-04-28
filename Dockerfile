@@ -70,6 +70,8 @@ FROM ubuntu:18.04 as base
 ARG NODE_VERSION
 ARG YARN_VERSION
 
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
+
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
 RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
@@ -95,7 +97,7 @@ FROM ubuntu:18.04 as builder
 ARG NODE_VERSION
 ARG YARN_VERSION
 
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential python git
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential python git ca-certificates
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
