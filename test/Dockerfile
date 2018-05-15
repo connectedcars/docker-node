@@ -1,6 +1,7 @@
 ARG NODE_VERSION=10.0.0
+ARG BRANCH_NAME=master
 
-FROM gcr.io/connectedcars-staging/node-builder.master:$NODE_VERSION as builder
+FROM gcr.io/connectedcars-staging/node-builder.$BRANCH_NAME:$NODE_VERSION as builder
 
 ARG GITHUB_PAT
 
@@ -19,7 +20,7 @@ RUN npm install
 
 RUN npm test
 
-FROM gcr.io/connectedcars-staging/node-base.master:$NODE_VERSION
+FROM gcr.io/connectedcars-staging/node-base.$BRANCH_NAME:$NODE_VERSION
 
 WORKDIR /app
 
