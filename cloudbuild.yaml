@@ -1,20 +1,20 @@
 steps:
-  # node 10.4.1
+  # node 10.5.0
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=10.4.1 --tag=gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.4.1 --tag=gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.1.0 --build-arg=YARN_VERSION=1.7.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
+    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=10.5.0 --tag=gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.5.0 --tag=gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.1.0 --build-arg=YARN_VERSION=1.7.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=10.4.1 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.4.1 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.1.0 --build-arg=YARN_VERSION=1.7.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
+    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=10.5.0 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.5.0 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.1.0 --build-arg=YARN_VERSION=1.7.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=10.4.1 --tag=test:10.4.1 --build-arg=GITHUB_PAT=$$GITHUB_PAT test/']
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=10.5.0 --tag=test:10.5.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT test/']
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker run test:10.4.1']
+    args: ['-c', 'docker run test:10.5.0']
 
   # node 8.11.3
   - name: 'gcr.io/cloud-builders/docker'
@@ -33,8 +33,8 @@ steps:
     entrypoint: 'bash'
     args: ['-c', 'docker run test:8.11.3']
 images: 
-  - 'gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.4.1'
-  - 'gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.4.1'
+  - 'gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.5.0'
+  - 'gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.5.0'
   - 'gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:10.x'
   - 'gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.x'
   - 'gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:8.11.3'
