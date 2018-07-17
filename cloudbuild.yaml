@@ -10,7 +10,7 @@ steps:
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=10.5.0 --tag=test:10.5.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT test/']
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=10.5.0 --build-arg=BRANCH_NAME=$BRANCH_NAME --tag=test:10.5.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT test/']
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
