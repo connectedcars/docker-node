@@ -92,7 +92,7 @@ ENV NODE_ENV production
 WORKDIR /app
 
 # Disable color output
-npm config set color false
+RUN npm config set color false
 
 FROM ubuntu:18.04 as builder
 
@@ -116,4 +116,4 @@ RUN cd /opt/connectedcars/package-auth && yarn
 ENV PATH /opt/connectedcars/bin:$PATH
 
 # Disable color output
-npm config set color false
+RUN npm config set color false
