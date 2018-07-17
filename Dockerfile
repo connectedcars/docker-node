@@ -8,6 +8,9 @@ FROM ubuntu:18.04 as downloader
 ARG NODE_VERSION
 ARG YARN_VERSION
 
+# Disable color output 
+ENV NO_COLOR=true
+
 # Install base dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		git \
@@ -70,6 +73,9 @@ FROM ubuntu:18.04 as base
 ARG NODE_VERSION
 ARG YARN_VERSION
 
+# Disable color output 
+ENV NO_COLOR=true
+
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 
 # Copy over node
@@ -99,6 +105,9 @@ FROM ubuntu:18.04 as builder
 # Import
 ARG NODE_VERSION
 ARG YARN_VERSION
+
+# Disable color output 
+ENV NO_COLOR=true
 
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential python git ca-certificates
 
