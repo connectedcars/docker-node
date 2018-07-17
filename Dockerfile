@@ -111,3 +111,6 @@ ARG GITHUB_PAT
 ADD ./opt /opt
 RUN cd /opt/connectedcars/package-auth && yarn
 ENV PATH /opt/connectedcars/bin:$PATH
+
+# Disable color output
+npm config set color false
