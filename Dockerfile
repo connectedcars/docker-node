@@ -91,6 +91,9 @@ USER node
 ENV NODE_ENV production
 WORKDIR /app
 
+# Disable color output
+npm config set color false
+
 FROM ubuntu:18.04 as builder
 
 # Import
