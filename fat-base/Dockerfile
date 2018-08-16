@@ -1,17 +1,19 @@
+ARG NODE_VERSION=8.x
+
 FROM gcr.io/connectedcars-staging/node-base.master:$NODE_VERSION
 
 USER root
+
+COPY sidpgp.key /app
 
 # Add stable for a newer lftp version
 RUN echo 'deb http://deb.debian.org/debian sid main' >> /etc/apt/sources.list
 
 # Install gpg2
-# RUN apt-get install gnupg2 -y
+RUN apt-get install gnupg2 -y
 
 # Add gpg key for sid
-# RUN gpg2 --keyserver pgpkeys.mit.edu --recv-key  8B48AD6246925553   # server not responding 50% of the time 
-# RUN gpg2 -a --export 8B48AD6246925553 | apt-key add -
-# RUN cat /app/sidpgp.key | apt-key add -
+RUN cat /app/sidpgp.key | apt-key add -
 
 # Install lftp and openssh and dependencies for puppeteer (chromium)
 RUN apt-get update && apt-get -yq install openssh-client lftp/sid \
@@ -23,8 +25,8 @@ ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils 
 && rm -rf /var/lib/apt/lists/*
 
 # Add Semler external ftp to known hosts
-RUN mkdir -p /nonexistent/.ssh
-RUN ssh-keyscan -t rsa 195.249.218.231 > /nonexistent/.ssh/known_hosts
-RUN chmod 644 /nonexistent/.ssh/known_hosts && chown nobody:nogroup -R /nonexistent/
+RUN mkdir -p /node/.ssh
+RUN ssh-keyscan -t rsa 195.249.218.231 > /node/.ssh/known_hosts
+RUN chmod 644 /node/.ssh/known_hosts && chown node:node -R /node/
 
-USER nobody
+USER node
