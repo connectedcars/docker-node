@@ -44,6 +44,7 @@ images:
   - 'gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:8.11.4'
   - 'gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:8.11.4'
   - 'gcr.io/$PROJECT_ID/node-base.$BRANCH_NAME:8.x'
+  - 'gcr.io/$PROJECT_ID/node-fat-base.$BRANCH_NAME:8.x'
   - 'gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:8.x'
 secrets:
 - kmsKeyName: projects/connectedcars-staging/locations/global/keyRings/cloudbuilder/cryptoKeys/connectedcars-builder
