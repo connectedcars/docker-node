@@ -16,11 +16,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		git \
 		openssh-client \
 		procps \
-        gnupg \
-        ca-certificates \
+    gnupg \
+    ca-certificates \
 		curl \
 		wget \
-        xz-utils \
+    xz-utils \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /opt
