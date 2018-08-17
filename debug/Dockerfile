@@ -15,6 +15,7 @@ RUN ls -la
 
 WORKDIR node-v10.9.0 
 
-RUN ./configure --debug
+RUN ./configure --debug --prefix=/opt/node-v10.9.0-linux-x64/
 
-RUN make -j4
+RUN make
+RUN make install

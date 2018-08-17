@@ -6,6 +6,10 @@ steps:
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=10.9.0 --tag=gcr.io/$PROJECT_ID/node-fat-base.$BRANCH_NAME:10.9.0 --tag=gcr.io/$PROJECT_ID/node-debug-base.$BRANCH_NAME:10.9.0 --build-arg=GITHUB_PAT=$$GITHUB_PAT debug/']
+    secretEnv: ['GITHUB_PAT']
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
     args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=10.9.0 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.9.0 --tag=gcr.io/$PROJECT_ID/node-builder.$BRANCH_NAME:10.x --build-arg=NPM_VERSION=6.4.0 --build-arg=YARN_VERSION=1.9.4 --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
