@@ -25,8 +25,8 @@ ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils 
 && rm -rf /var/lib/apt/lists/*
 
 # Add Semler external ftp to known hosts
-RUN mkdir -p /node/.ssh
-RUN ssh-keyscan -t rsa 195.249.218.231 > /node/.ssh/known_hosts
-RUN chmod 644 /node/.ssh/known_hosts && chown node:node -R /node/
+RUN mkdir -p /home/node/.ssh
+RUN ssh-keyscan -t rsa 195.249.218.231 > /home/node/.ssh/known_hosts
+RUN chmod 644 /home/node/.ssh/known_hosts
 
 USER node
