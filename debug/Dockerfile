@@ -20,6 +20,9 @@ RUN ./configure --debug --prefix=/opt/node-v10.9.0-linux-x64/
 RUN make
 RUN make install
 
+# Overwrite with debug node
+RUN cp -f out/Debug/node /opt/node-v10.9.0-linux-x64/bin/node
+
 FROM ubuntu:18.04 as base
 
 # Import
