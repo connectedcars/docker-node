@@ -52,6 +52,19 @@ RUN tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /opt --no-same-owner
 RUN ln -s /opt/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node
 RUN /opt/node-v$NODE_VERSION-linux-x64/bin/npm install -g npm@$NPM_VERSION
 
+### Overwrite with node debug addalaeax fix to have same version on builder and 'user'
+RUN git clone --single-branch -b fix-utf16 https://github.com/addaleax/node.git
+RUN apt-get install -y --no-install-recommends python
+WORKDIR node
+RUN ./configure --debug --prefix=/opt/node-v10.9.0-linux-x64/
+RUN make
+RUN make install
+# Overwrite with debug node
+RUN cp -f out/Debug/node /opt/node-v10.9.0-linux-x64/bin/node
+###
+
+
+
 # Install Yarn
 
 RUN set -ex \
