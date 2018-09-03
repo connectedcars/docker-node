@@ -5,15 +5,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN apt-get install -y --no-install-recommends wget ca-certificates
 
-RUN wget -q https://nodejs.org/dist/v10.9.0/node-v10.9.0.tar.gz
+#RUN wget -q https://nodejs.org/dist/v10.9.0/node-v10.9.0.tar.gz
+RUN git clone --single-branch -b fix-utf16 https://github.com/addaleax/node.git
 
-RUN tar -xzf node-v10.9.0.tar.gz
+#RUN tar -xzf node-v10.9.0.tar.gz
 
 RUN apt-get install -y --no-install-recommends python
 
 RUN ls -la
 
-WORKDIR node-v10.9.0 
+#WORKDIR node-v10.9.0 
+WORKDIR node
 
 RUN ./configure --debug --prefix=/opt/node-v10.9.0-linux-x64/
 
