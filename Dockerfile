@@ -13,6 +13,7 @@ ENV NO_COLOR=true
 
 # Install base dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    python \
 		git \
 		openssh-client \
 		procps \
@@ -54,7 +55,6 @@ RUN /opt/node-v$NODE_VERSION-linux-x64/bin/npm install -g npm@$NPM_VERSION
 
 ### Overwrite with 10.9.0 with node master debug to have same version on builder and debug image
 RUN git clone https://github.com/nodejs/node.git
-RUN apt-get install -y --no-install-recommends python
 WORKDIR node
 RUN ./configure --debug --prefix=/opt/node-v10.9.0-linux-x64/
 RUN make
