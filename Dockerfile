@@ -22,6 +22,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		curl \
 		wget \
     xz-utils \
+    make \ 
+    g++ \
+    libssl-dev \
+    build-essential \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /opt
