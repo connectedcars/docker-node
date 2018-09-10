@@ -1,4 +1,4 @@
-ARG NODE_VERSION=8.x
+ARG NODE_VERSION=10.x
 
 FROM gcr.io/connectedcars-staging/node-base.master:$NODE_VERSION
 
