@@ -1,6 +1,7 @@
 ARG NODE_VERSION=10.x
+ARG BRANCH_NAME=master
 
-FROM gcr.io/connectedcars-staging/node-base.master:$NODE_VERSION
+FROM gcr.io/connectedcars-staging/node-base.${BRANCH_NAME}:$NODE_VERSION
 
 USER root
 
