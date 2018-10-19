@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "npx onchange '**/*.js' -- npx prettier --no-semi --single-quote --write {{changed}}",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "keywords": [],
   "author": "",
