@@ -124,5 +124,19 @@ ADD ./opt /opt
 RUN cd /opt/connectedcars/package-auth && yarn
 ENV PATH /opt/connectedcars/bin:$PATH
 
-# Disable color output
+# Create user for builder
+RUN groupadd --gid 2000 builder \
+  && useradd --uid 2000 --gid builder --shell /bin/bash --create-home builder
+
+RUN mkdir -p /app/tmp
+RUN chown builder:builder /app/tmp
+
+# Disable color output for builder account
+USER builder
 RUN npm config set color false
+
+# Disable color output for root
+USER root
+RUN npm config set color false
+
+# TODO: set this USER builder as default when all repos has been tested
