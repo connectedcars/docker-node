@@ -33,6 +33,8 @@ RUN gpg --batch --yes --import /tmp/keys/*.gpg
 # Install Yarn
 RUN curl -sSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v$NODE_VERSION-linux-x64.tar.xz"
 RUN curl -sSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc"
+RUN cat SHASUMS256.txt
+RUN cat SHASUMS256.txt.asc
 RUN gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc
 RUN grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c -
 RUN tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /opt --no-same-owner
