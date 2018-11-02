@@ -12,7 +12,7 @@ steps:
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_11} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_11} --tag=gcr.io/${PROJECT_ID}/node-debug-base.${BRANCH_NAME}:${_NODE_VERSION_11} --build-arg=GITHUB_PAT=$$GITHUB_PAT fat-base/']
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_11} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_11} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:11.x --build-arg=GITHUB_PAT=$$GITHUB_PAT fat-base/']
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
@@ -33,7 +33,7 @@ steps:
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_10} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_10} --tag=gcr.io/${PROJECT_ID}/node-debug-base.${BRANCH_NAME}:${_NODE_VERSION_10} --build-arg=GITHUB_PAT=$$GITHUB_PAT fat-base/']
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_10} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_10} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:10.x --build-arg=GITHUB_PAT=$$GITHUB_PAT fat-base/']
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
