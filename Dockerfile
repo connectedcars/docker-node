@@ -7,6 +7,7 @@ FROM ubuntu:18.04 as downloader
 # Import
 ARG NODE_VERSION
 ARG YARN_VERSION
+ARG NPM_VERSION
 
 # Disable color output 
 ENV NO_COLOR=true
@@ -30,30 +31,31 @@ RUN mkdir -p /tmp/keys
 COPY keys/*.gpg /tmp/keys/
 RUN gpg --batch --yes --import /tmp/keys/*.gpg
 
-# Install Yarn
-RUN curl -sSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v$NODE_VERSION-linux-x64.tar.xz"
-RUN curl -sSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc"
-RUN cat SHASUMS256.txt.asc
+RUN echo "Downloading NodeJS version: $NODE_VERSION"
+RUN curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/node-v$NODE_VERSION-linux-x64.tar.xz"
+RUN curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc"
 RUN gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc
-RUN cat SHASUMS256.txt
 RUN grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c -
 RUN tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /opt --no-same-owner
 RUN ln -s /opt/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node
+
+RUN echo "Installing NPM version: $NPM_VERSION"
 RUN /opt/node-v$NODE_VERSION-linux-x64/bin/npm install -g npm@$NPM_VERSION
 
 # Install Yarn
-RUN curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz"
-RUN curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc"
+RUN echo "Downloading Yarn version: $YARN_VERSION"
+RUN curl -fSLO --compressed --fail "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz"
+RUN curl -fSLO --compressed --fail "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc"
 RUN gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
 RUN tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ --no-same-owner
 
 FROM ubuntu:18.04 as base
 
-RUN echo "Building base image"
-
 # Import
 ARG NODE_VERSION
 ARG YARN_VERSION
+
+RUN echo "Building base image with node version: ${NODE_VERSION}"
 
 # Disable color output 
 ENV NO_COLOR=true
@@ -84,11 +86,11 @@ RUN npm config set color false
 
 FROM ubuntu:18.04 as builder
 
-RUN echo "Building builder image"
-
 # Import
 ARG NODE_VERSION
 ARG YARN_VERSION
+
+RUN echo "Building builder image with node version: ${NODE_VERSION}"
 
 # Disable color output 
 ENV NO_COLOR=true
