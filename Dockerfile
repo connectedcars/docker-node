@@ -9,11 +9,13 @@ ARG NODE_VERSION
 ARG YARN_VERSION
 ARG NPM_VERSION
 
+RUN echo "Building downloader image with node version: ${NODE_VERSION}"
+
 # Disable color output 
 ENV NO_COLOR=true
 
 # Install base dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
 		git \
 		openssh-client \
 		procps \
@@ -60,7 +62,7 @@ RUN echo "Building base image with node version: ${NODE_VERSION}"
 # Disable color output 
 ENV NO_COLOR=true
 
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
+RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends ca-certificates
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
@@ -95,7 +97,7 @@ RUN echo "Building builder image with node version: ${NODE_VERSION}"
 # Disable color output 
 ENV NO_COLOR=true
 
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential python git ca-certificates
+RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
