@@ -69,6 +69,8 @@ RUN tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ --no-same-owner
 
 FROM ubuntu:18.04 as base
 
+RUN echo "Building base image"
+
 # Import
 ARG NODE_VERSION
 ARG YARN_VERSION
@@ -101,6 +103,8 @@ WORKDIR /app
 RUN npm config set color false
 
 FROM ubuntu:18.04 as builder
+
+RUN echo "Building builder image"
 
 # Import
 ARG NODE_VERSION
