@@ -7,12 +7,15 @@ FROM ubuntu:18.04 as downloader
 # Import
 ARG NODE_VERSION
 ARG YARN_VERSION
+ARG NPM_VERSION
+
+RUN echo "Building downloader image with node version: ${NODE_VERSION}"
 
 # Disable color output 
 ENV NO_COLOR=true
 
 # Install base dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
 		git \
 		openssh-client \
 		procps \
@@ -25,45 +28,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN mkdir -p /opt
 
-# Install Yarn
+# Import gpg keys for download verification
+RUN mkdir -p /tmp/keys
+COPY keys/*.gpg /tmp/keys/
+RUN gpg --batch --yes --import /tmp/keys/*.gpg
 
-# gpg keys listed at https://github.com/nodejs/node#release-team
-RUN set -ex \
-  && for key in \
-    94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
-    B9AE9905FFD7803F25714661B63B535A4C206CA9 \
-    77984A986EBC2AA786BC0F66B01FBB92821C587A \
-    71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
-    FD3A5288F042B6850C66B31F09FE44734EB7990E \
-    8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600 \
-    C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \    
-    DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
-  ; do \
-    gpg -q --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-    gpg -q --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-    gpg -q --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
-  done
-
-RUN curl -sSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v$NODE_VERSION-linux-x64.tar.xz"
-RUN curl -sSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc"
+RUN echo "Downloading NodeJS version: $NODE_VERSION"
+RUN curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/node-v$NODE_VERSION-linux-x64.tar.xz"
+RUN curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc"
 RUN gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc
 RUN grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c -
 RUN tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /opt --no-same-owner
 RUN ln -s /opt/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node
+
+RUN echo "Installing NPM version: $NPM_VERSION"
 RUN /opt/node-v$NODE_VERSION-linux-x64/bin/npm install -g npm@$NPM_VERSION
 
 # Install Yarn
-
-RUN set -ex \
-  && for key in \
-    6A010C5166006599AA17F08146C2130DFD2497F5 \
-  ; do \
-    gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-    gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-    gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
-  done
-RUN curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz"
-RUN curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc"
+RUN echo "Downloading Yarn version: $YARN_VERSION"
+RUN curl -fSLO --compressed --fail "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz"
+RUN curl -fSLO --compressed --fail "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc"
 RUN gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
 RUN tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ --no-same-owner
 
@@ -73,10 +57,12 @@ FROM ubuntu:18.04 as base
 ARG NODE_VERSION
 ARG YARN_VERSION
 
+RUN echo "Building base image with node version: ${NODE_VERSION}"
+
 # Disable color output 
 ENV NO_COLOR=true
 
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
+RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends ca-certificates
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
@@ -106,10 +92,12 @@ FROM ubuntu:18.04 as builder
 ARG NODE_VERSION
 ARG YARN_VERSION
 
+RUN echo "Building builder image with node version: ${NODE_VERSION}"
+
 # Disable color output 
 ENV NO_COLOR=true
 
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential python git ca-certificates
+RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
