@@ -11,18 +11,19 @@ ARG NPM_VERSION
 
 RUN echo "Building downloader image with node version: ${NODE_VERSION}"
 
-# Disable color output 
+# Disable color output and be less verbose
 ENV NO_COLOR=true
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # Install base dependencies
 RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
-		git \
-		openssh-client \
-		procps \
+	git \
+	openssh-client \
+	procps \
     gnupg \
     ca-certificates \
-		curl \
-		wget \
+	curl \
+	wget \
     xz-utils \
 	&& rm -rf /var/lib/apt/lists/*
 
@@ -59,10 +60,14 @@ ARG YARN_VERSION
 
 RUN echo "Building base image with node version: ${NODE_VERSION}"
 
-# Disable color output 
+# Disable color output and be less verbose
 ENV NO_COLOR=true
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends ca-certificates
+RUN apt-get update -qq && \
+	apt-get dist-upgrade -qq -y --no-install-recommends && \
+	apt-get install -qq -y --no-install-recommends ca-certificates && \
+	rm -rf /var/lib/apt/lists/*
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
@@ -83,7 +88,7 @@ USER node
 ENV NODE_ENV production
 WORKDIR /app
 
-# Disable color output
+# Disable color output and be less verbose
 RUN npm config set color false
 
 FROM ubuntu:18.04 as builder
@@ -96,8 +101,12 @@ RUN echo "Building builder image with node version: ${NODE_VERSION}"
 
 # Disable color output 
 ENV NO_COLOR=true
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates
+RUN apt-get update -qq && \
+	apt-get dist-upgrade -qq -y --no-install-recommends && \
+	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates && \
+	rm -rf /var/lib/apt/lists/*
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
