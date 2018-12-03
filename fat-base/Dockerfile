@@ -5,16 +5,15 @@ FROM gcr.io/connectedcars-staging/node-base.${BRANCH_NAME}:$NODE_VERSION
 
 USER root
 
-COPY sidpgp.key /app
-
-# Add stable for a newer lftp version
-RUN echo 'deb http://deb.debian.org/debian sid main' >> /etc/apt/sources.list
-
 # Install gpg2
 RUN apt-get update && apt-get install gnupg2 -y && rm -rf /var/lib/apt/lists/*
 
 # Add gpg key for sid
+COPY sidpgp.key /app
 RUN cat /app/sidpgp.key | apt-key add -
+
+# Add stable for a newer lftp version
+RUN echo 'deb http://deb.debian.org/debian sid main' >> /etc/apt/sources.list
 
 # Install lftp and openssh and dependencies for puppeteer (chromium)
 RUN apt-get update && apt-get -yq install openssh-client lftp/sid \
