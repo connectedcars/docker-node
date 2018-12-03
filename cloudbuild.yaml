@@ -1,7 +1,7 @@
 substitutions:
-  _NODE_VERSION_11: 11.1.0
-  _NODE_VERSION_10: 10.13.0
-  _YARN_VERSION: 1.12.1
+  _NODE_VERSION_11: 11.3.0
+  _NODE_VERSION_10: 10.14.1
+  _YARN_VERSION: 1.12.3
   _NPM_VERSION: 6.4.1
 steps:
   # node 11.x
