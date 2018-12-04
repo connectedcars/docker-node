@@ -1,4 +1,5 @@
 const githubRegex = /^git\+ssh:\/\/git(@github.com)/
+const githubShortRegex = /^github:/
 
 function packageJSONRewrite(packageJSON, token) {
     let changed = false
@@ -8,7 +9,9 @@ function packageJSONRewrite(packageJSON, token) {
         }
         for (let dependencyName of Object.keys(packageJSON[dependencyType]) ) {
             let dependencyUrl = packageJSON[dependencyType][dependencyName]
-            let replacement = dependencyUrl.replace(githubRegex, `git+https://${token}:$1`)
+            let replacement = dependencyUrl
+                .replace(githubRegex, `git+https://${token}:$1`)
+                .replace(githubShortRegex, `git+https://${token}:@github.com/`)
             if(replacement !== dependencyUrl) {
                 packageJSON[dependencyType][dependencyName] = replacement
                 changed = true
@@ -26,7 +29,9 @@ function packageLockJSONRewrite(packageLockJSON, token) {
         }
         for (let dependencyName of Object.keys(packageLockJSON[dependencyType])) {
             let dependencyUrl = packageLockJSON[dependencyType][dependencyName].version
-            let replacement = dependencyUrl.replace(githubRegex, `git+https://${token}:$1`)
+            let replacement = dependencyUrl
+                .replace(githubRegex, `git+https://${token}:$1`)
+                .replace(githubShortRegex, `git+https://${token}:@github.com/`)
             if (replacement !== dependencyUrl) {
                 packageLockJSON[dependencyType][dependencyName].version = replacement
                 changed = true
