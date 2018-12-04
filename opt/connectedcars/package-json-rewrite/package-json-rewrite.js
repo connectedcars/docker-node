@@ -24,7 +24,7 @@ function packageLockJSONRewrite(packageLockJSON, token) {
         if(packageLockJSON[dependencyType] == null) {
             continue
         }
-        for (let dependencyName of Object.keys(packageLockJSON[dependencyType]) || []) {
+        for (let dependencyName of Object.keys(packageLockJSON[dependencyType])) {
             let dependencyUrl = packageLockJSON[dependencyType][dependencyName].version
             let replacement = dependencyUrl.replace(githubRegex, `git+https://${token}:$1`)
             if (replacement !== dependencyUrl) {
