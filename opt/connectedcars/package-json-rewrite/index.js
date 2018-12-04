@@ -58,10 +58,9 @@ function runProcess(path, processArgs) {
 }
 
 function replace(filename, data) {
-    fs.renameSync(filename, `${filename}.orig`)
     fs.writeFileSync(`${filename}.new`, data)
+    fs.renameSync(filename, `${filename}.orig`)
     fs.renameSync(`${filename}.new`, `${filename}`)
-
 }
 
 function restore() {
