@@ -1,5 +1,10 @@
-const githubRegex = /^git\+ssh:\/\/git(@github.com)/
-const githubShortRegex = /^github:/
+const providers = {
+    github: 'github.com'
+}
+
+const providerRegex = new RegExp(
+    `^(?<provider>${Object.keys(providers).join('|')}):(?<username>.*)/(?<repository>[^#]*)(?<version>#.+)?$`
+  )
 
 function packageJSONRewrite(packageJSON, token) {
     let changed = false
@@ -9,9 +14,7 @@ function packageJSONRewrite(packageJSON, token) {
         }
         for (let dependencyName of Object.keys(packageJSON[dependencyType]) ) {
             let dependencyUrl = packageJSON[dependencyType][dependencyName]
-            let replacement = dependencyUrl
-                .replace(githubRegex, `git+https://${token}:$1`)
-                .replace(githubShortRegex, `git+https://${token}:@github.com/`)
+            let replacement = replaceUrl(dependencyUrl, token)
             if(replacement !== dependencyUrl) {
                 packageJSON[dependencyType][dependencyName] = replacement
                 changed = true
@@ -29,9 +32,7 @@ function packageLockJSONRewrite(packageLockJSON, token) {
         }
         for (let dependencyName of Object.keys(packageLockJSON[dependencyType])) {
             let dependencyUrl = packageLockJSON[dependencyType][dependencyName].version
-            let replacement = dependencyUrl
-                .replace(githubRegex, `git+https://${token}:$1`)
-                .replace(githubShortRegex, `git+https://${token}:@github.com/`)
+            let replacement = replaceUrl(dependencyUrl, token)
             if (replacement !== dependencyUrl) {
                 packageLockJSON[dependencyType][dependencyName].version = replacement
                 changed = true
@@ -40,4 +41,15 @@ function packageLockJSONRewrite(packageLockJSON, token) {
     }
     return changed
 }
+
+function replaceUrl(url, token) {
+    let match = url.match(providerRegex)
+    if(match) {
+        const { provider, username, repository, version } = { ...match.groups }
+        const host = providers[provider]
+        return `git+https://${token}:@${host}/${username}/${repository}.git${version || ''}`
+    }
+    return url.replace(/^git\+ssh:\/\/git(@github.com)/, `git+https://${token}:$1`)
+}
+
 module.exports = { packageJSONRewrite, packageLockJSONRewrite }
