@@ -1,0 +1,33 @@
+{
+  "name": "package-auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "npx onchange '**/*.js' -- npx prettier --no-semi --single-quote --write {{changed}}",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^23.6.0"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>"
+    ],
+    "testEnvironment": "node",
+    "testRegex": ".+\\.test\\.js$",
+    "collectCoverage": false,
+    "collectCoverageFrom": [
+      "**/*.{ts}",
+      "!**/node_modules/**",
+      "!**/types/**"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "node"
+    ]
+  }
+}

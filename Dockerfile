@@ -118,7 +118,7 @@ COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
 # Setup private repo npm/yarn wrappers
 ARG GITHUB_PAT
 ADD ./opt /opt
-RUN cd /opt/connectedcars/package-auth && yarn
+RUN cd /opt/connectedcars/package-json-rewrite && npm install --production
 ENV PATH /opt/connectedcars/bin:$PATH
 
 # Disable color output
