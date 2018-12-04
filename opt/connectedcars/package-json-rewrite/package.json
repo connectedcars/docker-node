@@ -1,15 +1,18 @@
 {
-  "name": "package-auth",
+  "name": "package-json-rewrite",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "npx onchange '**/*.js' -- npx prettier --no-semi --single-quote --write {{changed}}",
     "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:connectedcars/docker-node.git"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "jest": "^23.6.0"
   },
