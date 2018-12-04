@@ -1,18 +1,1 @@
-#!/bin/bash
-set -eu -o pipefail
-
-GITHUB_PAT=${GITHUB_PAT:-}
-
-if [[ -n "$GITHUB_PAT" ]]; then
-    echo "Rewrite github git+ssh references and inject personal access token"
-    node /opt/connectedcars/package-auth/index.js rewrite $GITHUB_PAT $PWD/package.json
-    node /opt/connectedcars/package-auth/index.js rewrite-lock $GITHUB_PAT $PWD/package-lock.json
-fi
-
-/usr/local/bin/npm $@
-
-if [[ -n "$GITHUB_PAT" ]]; then
-    echo "Reverting changes"
-    node /opt/connectedcars/package-auth/index.js revert $GITHUB_PAT $PWD/package.json
-    node /opt/connectedcars/package-auth/index.js revert-lock $GITHUB_PAT $PWD/package-lock.json
-fi
+../package-json-rewrite/index.js
