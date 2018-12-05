@@ -115,10 +115,11 @@ RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 # Copy over yarn
 COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
 
-# Setup private repo npm/yarn wrappers
-ARG GITHUB_PAT
-ADD ./opt /opt
-RUN cd /opt/connectedcars/package-json-rewrite && npm install --production
+# Setup github token injection wrappers for npm and yarn
+RUN npm install -g https://github.com/connectedcars/node-package-json-rewrite
+RUN mkdir -p /opt/connectedcars/bin
+RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/npm
+RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/yarn
 ENV PATH /opt/connectedcars/bin:$PATH
 
 # Disable color output
