@@ -124,3 +124,8 @@ ENV PATH /opt/connectedcars/bin:$PATH
 
 # Disable color output
 RUN npm config set color false
+
+# Fix for npm "prepare" not running under root
+RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builder
+RUN mkdir -p /app/tmp
+RUN chown -R builder:builder /app
