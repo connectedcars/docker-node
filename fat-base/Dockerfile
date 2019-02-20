@@ -5,12 +5,13 @@ FROM gcr.io/connectedcars-staging/node-base.${BRANCH_NAME}:$NODE_VERSION
 
 USER root
 
-# Install gpg2
-RUN apt-get update && apt-get install gnupg2 -y && rm -rf /var/lib/apt/lists/*
+# Add gpg keys for sid and other debian releases
+RUN apt-get update && apt-get -yq install debian-keyring debian-archive-keyring gnupg2 && rm -rf /var/lib/apt/lists/*
 
-# Add gpg key for sid
-COPY sidpgp.key /app
-RUN cat /app/sidpgp.key | apt-key add -
+# Import keys
+RUN mkdir -p /tmp/keys
+COPY *.gpg /tmp/keys/
+RUN apt-key adv --import /tmp/keys/*.gpg
 
 # Add stable for a newer lftp version
 RUN echo 'deb http://deb.debian.org/debian sid main' >> /etc/apt/sources.list
