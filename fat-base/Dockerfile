@@ -6,7 +6,12 @@ FROM gcr.io/connectedcars-staging/node-base.${BRANCH_NAME}:$NODE_VERSION
 USER root
 
 # Add gpg keys for sid and other debian releases
-RUN apt-get update && apt-get -yq install debian-keyring debian-archive-keyring && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get -yq install debian-keyring debian-archive-keyring gnupg2 && rm -rf /var/lib/apt/lists/*
+
+# Import keys
+RUN mkdir -p /tmp/keys
+COPY keys/*.gpg /tmp/keys/
+RUN gpg --batch --yes --import /tmp/keys/*.gpg
 
 # Add stable for a newer lftp version
 RUN echo 'deb http://deb.debian.org/debian sid main' >> /etc/apt/sources.list
