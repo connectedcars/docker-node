@@ -11,7 +11,7 @@ RUN apt-get update && apt-get -yq install debian-keyring debian-archive-keyring 
 # Import keys
 RUN mkdir -p /tmp/keys
 COPY *.gpg /tmp/keys/
-RUN gpg --batch --yes --import /tmp/keys/*.gpg
+RUN apt-key adv --import /tmp/keys/*.gpg
 
 # Add stable for a newer lftp version
 RUN echo 'deb http://deb.debian.org/debian sid main' >> /etc/apt/sources.list
