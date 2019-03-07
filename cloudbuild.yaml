@@ -1,8 +1,8 @@
 substitutions:
-  _NODE_VERSION_11: 11.10.0
-  _NODE_VERSION_10: 10.15.1
+  _NODE_VERSION_11: 11.11.0
+  _NODE_VERSION_10: 10.15.3
   _YARN_VERSION: 1.13.0
-  _NPM_VERSION: 6.8.0
+  _NPM_VERSION: 6.9.0
 steps:
   # node 11.x
   - name: 'gcr.io/cloud-builders/docker'
