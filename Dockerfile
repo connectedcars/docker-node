@@ -130,6 +130,13 @@ RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builde
 RUN mkdir -p /app/tmp
 RUN chown -R builder:builder /app
 
+# Add github.com keys to to known_hosts
+RUN mkdir /home/builder/.ssh
+RUN chown -R builder:builder /home/builder/.ssh
+RUN ssh-keyscan -t rsa github.com > /home/builder/.ssh/known_hosts
+RUN mkdir /root/.ssh
+RUN ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
+
 # Copy in the encypted ssh key
 COPY build.key /home/builder
 RUN chmod 600 /home/builder/build.key
