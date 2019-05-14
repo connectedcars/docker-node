@@ -116,7 +116,7 @@ RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
 
 # Setup github token injection wrappers for npm and yarn
-RUN npm install -g https://github.com/connectedcars/node-package-json-rewrite
+RUN npm install -g https://github.com/connectedcars/node-package-json-rewrite#sshauth
 RUN mkdir -p /opt/connectedcars/bin
 RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/npm
 RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/yarn
@@ -129,3 +129,7 @@ RUN npm config set color false
 RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builder
 RUN mkdir -p /app/tmp
 RUN chown -R builder:builder /app
+
+# Copy in the encypted ssh key
+COPY build.key /home/builder
+ENV SSH_KEY_PATH=/home/builder/build.key

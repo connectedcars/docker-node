@@ -4,6 +4,13 @@ substitutions:
   _YARN_VERSION: 1.15.2
   _NPM_VERSION: 6.9.0
 steps:
+  # copy build key to workspace
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args: [
+            'cp',
+            'gs://connectedcars-staging-cloudbuilder/build.key',
+            '.'
+          ]
   # node 11.x
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
@@ -15,7 +22,7 @@ steps:
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_11} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_11} --build-arg=GITHUB_PAT=$$GITHUB_PAT test/']
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_11} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_11} --build-arg=GITHUB_PAT=$$GITHUB_PAT --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT test/']
     secretEnv: ['GITHUB_PAT']
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
