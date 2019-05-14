@@ -132,4 +132,5 @@ RUN chown -R builder:builder /app
 
 # Copy in the encypted ssh key
 COPY build.key /home/builder
+RUN chmod 600 /home/builder/build.key
 ENV SSH_KEY_PATH=/home/builder/build.key
