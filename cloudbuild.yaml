@@ -8,7 +8,7 @@ steps:
   - name: 'gcr.io/cloud-builders/gsutil'
     args: [
             'cp',
-            'gs://connectedcars-staging-cloudbuilder/build.key',
+            'gs://connectedcars-staging-cloudbuilder-private/build.key',
             '.'
           ]
   # node 11.x
