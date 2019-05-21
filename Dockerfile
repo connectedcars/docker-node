@@ -116,7 +116,7 @@ RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
 
 # Setup github token injection wrappers for npm and yarn
-RUN npm install -g https://github.com/connectedcars/node-package-json-rewrite#sshauth
+RUN npm install -g https://github.com/connectedcars/node-package-json-rewrite
 RUN mkdir -p /opt/connectedcars/bin
 RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/npm
 RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/yarn
