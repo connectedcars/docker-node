@@ -105,7 +105,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 RUN apt-get update -qq && \
 	apt-get dist-upgrade -qq -y --no-install-recommends && \
-	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates && \
+	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates openssh-client && \
 	rm -rf /var/lib/apt/lists/*
 
 # Copy over node
@@ -129,3 +129,15 @@ RUN npm config set color false
 RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builder
 RUN mkdir -p /app/tmp
 RUN chown -R builder:builder /app
+
+# Add github.com keys to to known_hosts
+RUN mkdir /home/builder/.ssh
+RUN chown -R builder:builder /home/builder/.ssh
+RUN ssh-keyscan -t rsa github.com > /home/builder/.ssh/known_hosts
+RUN mkdir /root/.ssh
+RUN ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
+
+# Copy in the encypted ssh key
+COPY build.key /home/builder
+RUN chmod 600 /home/builder/build.key
+ENV SSH_KEY_PATH=/home/builder/build.key

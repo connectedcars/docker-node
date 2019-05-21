@@ -4,6 +4,7 @@ ARG BRANCH_NAME=master
 FROM gcr.io/connectedcars-staging/node-builder.$BRANCH_NAME:$NODE_VERSION as builder
 
 ARG GITHUB_PAT
+ARG SSH_KEY_PASSWORD
 
 WORKDIR /app
 
@@ -15,6 +16,8 @@ RUN ls -l
 RUN node -v
 RUN npm -v
 RUN yarn -v
+
+RUN npm run export
 
 RUN npm install
 
