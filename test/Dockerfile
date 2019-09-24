@@ -25,7 +25,7 @@ RUN id
 
 RUN mount -l
 
-RUN npm install
+RUN npm config set unsafe-perm true && npm install
 
 RUN npm test
 
