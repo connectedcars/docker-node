@@ -21,6 +21,8 @@ RUN npm run export
 
 ENV GIT_SSH_COMMAND "ssh -v"
 
+RUN id
+
 RUN npm install
 
 RUN npm test
