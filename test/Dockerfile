@@ -19,6 +19,8 @@ RUN yarn -v
 
 RUN npm run export
 
+ENV GIT_SSH_COMMAND "ssh -v"
+
 RUN npm install
 
 RUN npm test
