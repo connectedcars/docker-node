@@ -11,8 +11,6 @@ WORKDIR /app
 # Copy application code.
 COPY --chown=builder:builder . /app
 
-USER builder
-
 RUN ls -l
 
 RUN node -v
