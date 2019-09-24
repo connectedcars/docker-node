@@ -134,6 +134,7 @@ RUN chown -R builder:builder /app
 RUN mkdir /home/builder/.ssh
 RUN chown -R builder:builder /home/builder/.ssh
 RUN ssh-keyscan -t rsa github.com > /home/builder/.ssh/known_hosts
+RUN chown -R builder:builder /home/builder/.ssh
 RUN mkdir /root/.ssh
 RUN ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
 
