@@ -19,6 +19,8 @@ RUN yarn -v
 
 RUN npm run export
 
+RUN npm run id
+
 RUN ls -rl /tmp
 
 ENV GIT_SSH_COMMAND "ssh -v"
