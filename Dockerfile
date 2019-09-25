@@ -144,6 +144,6 @@ RUN mkdir /root/.ssh
 RUN ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
 
 # Copy in the encypted ssh key
-COPY --chown builder:builder build.key /home/builder
+COPY --chown=builder:builder build.key /home/builder
 RUN chmod 600 /home/builder/build.key
 ENV SSH_KEY_PATH=/home/builder/build.key
