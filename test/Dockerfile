@@ -8,8 +8,10 @@ ARG SSH_KEY_PASSWORD
 
 WORKDIR /app
 
+USER builder
+
 # Copy application code.
-COPY . /app
+COPY --chown=builder:builder . /app
 
 RUN ls -l
 
