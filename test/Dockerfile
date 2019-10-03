@@ -1,6 +1,5 @@
 ARG NODE_VERSION=10.0.0
 ARG BRANCH_NAME=master
-ARG USER=builder
 
 FROM gcr.io/connectedcars-staging/node-builder.$BRANCH_NAME:$NODE_VERSION as builder
 
@@ -9,10 +8,10 @@ ARG SSH_KEY_PASSWORD
 
 WORKDIR /app
 
-USER $USER
+USER builder
 
 # Copy application code.
-COPY --chown=$USER:$USER . /app
+COPY --chown=builder:builder . /app
 
 RUN ls -l
 

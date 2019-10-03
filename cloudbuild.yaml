@@ -24,11 +24,6 @@ steps:
     entrypoint: 'bash'
     args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_12} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:12.x --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
     secretEnv: ['GITHUB_PAT']
-  # Build test image as root
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=BRANCH_NAME=${BRANCH_NAME} --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT --build-arg=USER=root test/']
-    secretEnv: ['GITHUB_PAT']
   # Build test image as builder
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
