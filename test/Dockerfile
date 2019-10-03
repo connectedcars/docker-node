@@ -1,5 +1,6 @@
 ARG NODE_VERSION=10.0.0
 ARG BRANCH_NAME=master
+ARG USER=builder
 
 FROM gcr.io/connectedcars-staging/node-builder.$BRANCH_NAME:$NODE_VERSION as builder
 
@@ -8,10 +9,10 @@ ARG SSH_KEY_PASSWORD
 
 WORKDIR /app
 
-USER builder
+USER $USER
 
 # Copy application code.
-COPY --chown=builder:builder . /app
+COPY --chown=$USER:$USER . /app
 
 RUN ls -l
 
@@ -29,9 +30,7 @@ ENV GIT_SSH_COMMAND "ssh -v"
 
 RUN id
 
-RUN mount -l
-
-RUN npm config set unsafe-perm true && npm install
+RUN npm install
 
 RUN npm test
 
