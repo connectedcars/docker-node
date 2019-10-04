@@ -125,6 +125,11 @@ ENV PATH /opt/connectedcars/bin:$PATH
 # Disable color output
 RUN npm config set color false
 
+# When running as root don't drop to directory user
+RUN npm config set unsafe-perm true
+RUN npm config set user root
+RUN npm config set group root
+
 # Fix for npm "prepare" not running under root
 RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builder
 RUN mkdir -p /app/tmp
@@ -134,6 +139,7 @@ RUN chown -R builder:builder /app
 RUN mkdir /home/builder/.ssh
 RUN chown -R builder:builder /home/builder/.ssh
 RUN ssh-keyscan -t rsa github.com > /home/builder/.ssh/known_hosts
+RUN chown -R builder:builder /home/builder/.ssh
 RUN mkdir /root/.ssh
 RUN ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
 

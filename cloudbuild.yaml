@@ -1,5 +1,5 @@
 substitutions:
-  _NODE_VERSION_12: 12.8.1
+  _NODE_VERSION_12: 12.11.1
   _NODE_VERSION_10: 10.16.3
   _YARN_VERSION: 1.17.3
   _NPM_VERSION: 6.10.3
@@ -11,28 +11,36 @@ steps:
             'gs://connectedcars-staging-cloudbuilder-private/build.key',
             '.'
           ]
+  #
   # node 12.x
+  #
+  # Build base image
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_12} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:12.x --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
     secretEnv: ['GITHUB_PAT']
+  # Build builder image
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_12} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:12.x --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
     secretEnv: ['GITHUB_PAT']
+  # Build test image as builder
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_12} --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT test/']
     secretEnv: ['GITHUB_PAT']
+  # Run test build
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args: ['-c', 'docker run test:${_NODE_VERSION_12}']
+  # Build fatbase
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_12} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:12.x --build-arg=GITHUB_PAT=$$GITHUB_PAT fat-base/']
     secretEnv: ['GITHUB_PAT']
-  
+  #
   # node 10.x
+  #
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=${_NODE_VERSION_10} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_10} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:10.x --build-arg=GITHUB_PAT=$$GITHUB_PAT .']

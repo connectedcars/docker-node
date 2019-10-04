@@ -4,6 +4,7 @@
   "description": "Hello world module import sample",
   "main": "index.js",
   "scripts": {
+    "id": "id && ls -l $SSH_AUTH_SOCK",
     "export": "export",
     "start": "node .",
     "test": "NODE_ENV=test mocha test"
