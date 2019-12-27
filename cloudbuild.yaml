@@ -1,8 +1,9 @@
 substitutions:
-  _NODE_VERSION_12: 12.13.0
-  _NODE_VERSION_10: 10.17.0
-  _YARN_VERSION: 1.19.1
-  _NPM_VERSION: 6.12.0
+  _NODE_VERSION_13: 13.5.0
+  _NODE_VERSION_12: 12.14.0
+  _NODE_VERSION_10: 10.18.0
+  _YARN_VERSION: 1.21.1
+  _NPM_VERSION: 6.13.4
 steps:
   # copy build key to workspace
   - name: 'gcr.io/cloud-builders/gsutil'
@@ -11,6 +12,32 @@ steps:
             'gs://connectedcars-staging-cloudbuilder-private/build.key',
             '.'
           ]
+  # node 13.x
+  #
+  # Build base image
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=${_NODE_VERSION_13} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_13} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:13.x --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
+    secretEnv: ['GITHUB_PAT']
+  # Build builder image
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=${_NODE_VERSION_13} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_13} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:13.x --build-arg=GITHUB_PAT=$$GITHUB_PAT .']
+    secretEnv: ['GITHUB_PAT']
+  # Build test image as builder
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_13} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_13} --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT test/']
+    secretEnv: ['GITHUB_PAT']
+  # Run test build
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker run test:${_NODE_VERSION_13}']
+  # Build fatbase
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_13} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:13.x --build-arg=GITHUB_PAT=$$GITHUB_PAT fat-base/']
+    secretEnv: ['GITHUB_PAT']
   #
   # node 12.x
   #
