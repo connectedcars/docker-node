@@ -36,7 +36,7 @@ steps:
   # Build fatbase
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_13} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:13.x --build-arg=GITHUB_PAT=$$GITHUB_PAT fat-base/']
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_13} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_13} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:13.x --build-arg=GITHUB_PAT=$$GITHUB_PAT fat-base/']
     secretEnv: ['GITHUB_PAT']
   #
   # node 12.x
