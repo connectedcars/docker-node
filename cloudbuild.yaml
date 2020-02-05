@@ -92,6 +92,12 @@ steps:
     args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_10} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_10}-github-pat --build-arg=GITHUB_PAT=$$GITHUB_PAT test/']
     secretEnv: ['GITHUB_PAT']
 images: 
+  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:13.x'
+  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_13}'
+  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:13.x'
+  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_13}'
+  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:13.x'
+  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_13}'
   - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:12.x'
   - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_12}'
   - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:12.x'
