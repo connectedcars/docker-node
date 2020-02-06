@@ -1,8 +1,8 @@
 substitutions:
-  _NODE_VERSION_13: 13.7.0
-  _NODE_VERSION_12: 12.14.1
-  _NODE_VERSION_10: 10.18.1
-  _YARN_VERSION: 1.21.1
+  _NODE_VERSION_13: 13.8.0
+  _NODE_VERSION_12: 12.15.0
+  _NODE_VERSION_10: 10.19.0
+  _YARN_VERSION: 1.22.0
   _NPM_VERSION: 6.13.7
 steps:
   # copy build key to workspace
