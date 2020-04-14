@@ -135,7 +135,10 @@ RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builde
 RUN mkdir -p /app/tmp
 RUN chown -R builder:builder /app
 
-# Add github.com keys to to known_hosts
+# Disable SSH host key verification
+ENV GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+
+# Add github.com keys to to known_hosts as a fallback if the user overview GIT_SSH_COMMAND
 RUN mkdir /home/builder/.ssh
 RUN chown -R builder:builder /home/builder/.ssh
 RUN ssh-keyscan -t rsa github.com > /home/builder/.ssh/known_hosts
