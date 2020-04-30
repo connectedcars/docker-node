@@ -2,7 +2,7 @@ ARG NODE_VERSION=10.0.0
 ARG NPM_VERSION=6.0.0
 ARG YARN_VERSION=1.6.0
 
-FROM ubuntu:18.04 as downloader
+FROM ubuntu:20.04 as downloader
 
 # Import
 ARG NODE_VERSION
@@ -52,7 +52,7 @@ RUN curl -fSLO --compressed --fail "https://yarnpkg.com/downloads/$YARN_VERSION/
 RUN gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
 RUN tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ --no-same-owner
 
-FROM ubuntu:18.04 as base
+FROM ubuntu:20.04 as base
 
 # Import
 ARG NODE_VERSION
@@ -91,7 +91,7 @@ WORKDIR /app
 # Disable color output and be less verbose
 RUN npm config set color false
 
-FROM ubuntu:18.04 as builder
+FROM ubuntu:20.04 as builder
 
 # Import
 ARG NODE_VERSION
