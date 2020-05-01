@@ -105,7 +105,8 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 RUN apt-get update -qq && \
 	apt-get dist-upgrade -qq -y --no-install-recommends && \
-	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates openssh-client && \
+	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates openssh-client software-properties-common && \
+	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main" && \
 	rm -rf /var/lib/apt/lists/*
 
 # Copy over node
