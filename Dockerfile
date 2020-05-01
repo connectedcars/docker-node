@@ -109,6 +109,11 @@ RUN apt-get update -qq && \
 	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main" && \
 	rm -rf /var/lib/apt/lists/*
 
+# Make sure we use mysql-server from Ubuntu 18.04
+RUN echo 'Package: mysql-server\n\
+Pin: release n=bionic\n\
+Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
+
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
 RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
