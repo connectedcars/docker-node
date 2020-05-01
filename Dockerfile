@@ -105,8 +105,14 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 RUN apt-get update -qq && \
 	apt-get dist-upgrade -qq -y --no-install-recommends && \
-	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates openssh-client && \
+	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates openssh-client software-properties-common && \
+	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main" && \
 	rm -rf /var/lib/apt/lists/*
+
+# Make sure we use mysql-server from Ubuntu 18.04
+RUN echo 'Package: mysql-server\n\
+Pin: release n=bionic\n\
+Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
