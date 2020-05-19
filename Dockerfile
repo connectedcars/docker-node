@@ -138,16 +138,11 @@ ENV PATH /opt/connectedcars/bin:$PATH
 
 # Read NPM token from environment variable
 RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
-RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
 
 # Fix for npm "prepare" not running under root
 RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builder
 RUN mkdir -p /app/tmp
 RUN chown -R builder:builder /app
-
-USER builder
-RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
-USER root
 
 # Disable SSH host key verification
 ENV GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
