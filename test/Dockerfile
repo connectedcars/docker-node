@@ -1,8 +1,9 @@
-ARG NODE_VERSION=10.0.0
+ARG NODE_VERSION=12.x
 ARG BRANCH_NAME=master
 
 FROM gcr.io/connectedcars-staging/node-builder.$BRANCH_NAME:$NODE_VERSION as builder
 
+ARG NPM_TOKEN=""
 ARG GITHUB_PAT
 ARG SSH_KEY_PASSWORD
 
@@ -41,4 +42,4 @@ EXPOSE 3100
 
 COPY --from=builder /app .
 
-CMD npm start
+CMD node .

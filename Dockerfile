@@ -121,13 +121,6 @@ RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 # Copy over yarn
 COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
 
-# Setup github token injection wrappers for npm and yarn
-RUN npm install -g https://github.com/connectedcars/node-package-json-rewrite
-RUN mkdir -p /opt/connectedcars/bin
-RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/npm
-RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/yarn
-ENV PATH /opt/connectedcars/bin:$PATH
-
 # Disable color output
 RUN npm config set color false
 
@@ -135,6 +128,16 @@ RUN npm config set color false
 RUN npm config set unsafe-perm true
 RUN npm config set user root
 RUN npm config set group root
+
+# Setup github token injection wrappers for npm and yarn
+RUN npm install -g https://github.com/connectedcars/node-package-json-rewrite
+RUN mkdir -p /opt/connectedcars/bin
+RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/npm
+RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/yarn
+ENV PATH /opt/connectedcars/bin:$PATH
+
+# Read NPM token from environment variable
+RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
 
 # Fix for npm "prepare" not running under root
 RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builder
