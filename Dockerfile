@@ -137,7 +137,7 @@ RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/yarn
 ENV PATH /opt/connectedcars/bin:$PATH
 
 # Read NPM token from environment variable
-RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
+RUN npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}" --global
 
 # Fix for npm "prepare" not running under root
 RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builder
