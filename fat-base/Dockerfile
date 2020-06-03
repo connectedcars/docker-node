@@ -5,19 +5,8 @@ FROM gcr.io/connectedcars-staging/node-base.${BRANCH_NAME}:$NODE_VERSION
 
 USER root
 
-# Add gpg keys for sid and other debian releases
-RUN apt-get update && apt-get -yq install debian-keyring debian-archive-keyring gnupg2 && rm -rf /var/lib/apt/lists/*
-
-# Import keys
-RUN mkdir -p /tmp/keys
-COPY *.gpg /tmp/keys/
-RUN apt-key adv --import /tmp/keys/*.gpg
-
-# Add stable for a newer lftp version
-RUN echo 'deb http://deb.debian.org/debian sid main' >> /etc/apt/sources.list
-
 # Install lftp and openssh and dependencies for puppeteer (chromium)
-RUN apt-get update && apt-get -yq install openssh-client lftp/sid \
+RUN apt-get update && apt-get -yq install openssh-client lftp \
 gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 \
 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 \
 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 \
