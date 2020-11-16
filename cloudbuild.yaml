@@ -1,4 +1,5 @@
 substitutions:
+  _NODE_VERSION_15: 15.2.1
   _NODE_VERSION_14: 14.11.0
   _NODE_VERSION_12: 12.18.4
   _NODE_VERSION_10: 10.22.1
@@ -12,6 +13,35 @@ steps:
             'gs://connectedcars-staging-cloudbuilder-private/build.key',
             '.'
           ]
+  #
+  # node 15.x
+  #
+  # Build base image
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=${_NODE_VERSION_15} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_15} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:15.x .']
+   # Build builder image
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=${_NODE_VERSION_15} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_15} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:15.x .']
+  # Run test build
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_15} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_15} --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT --build-arg=NPM_TOKEN=$$NPM_TOKEN test/']
+    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
+  # Run test build
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker run test:${_NODE_VERSION_15}']
+  # Build fatbase
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_15} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_15} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:15.x fat-base/']
+  # Run test build - package json replace
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_15} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_15}-github-pat --build-arg=GITHUB_PAT=$$GITHUB_PAT --build-arg=NPM_TOKEN=$$NPM_TOKEN test/']
+    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
   # node 14.x
   #
   # Build base image
