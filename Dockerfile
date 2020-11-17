@@ -35,15 +35,17 @@ COPY keys/*.gpg /tmp/keys/
 RUN gpg --batch --yes --import /tmp/keys/*.gpg
 
 RUN echo "Downloading NodeJS version: $NODE_VERSION"
-RUN curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/node-v$NODE_VERSION-linux-x64.tar.xz"
-RUN curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc"
-RUN gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc
-RUN grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c -
-RUN tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /opt --no-same-owner
-RUN ln -s /opt/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node
+RUN curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/node-v$NODE_VERSION-linux-x64.tar.xz" \
+ 	&& curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
+	&& gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc
 
-RUN echo "Installing NPM version: $NPM_VERSION"
-RUN /opt/node-v$NODE_VERSION-linux-x64/bin/npm install -g npm@$NPM_VERSION
+# Do npm upgrade in same step as it will fail with "EXDEV: cross-device link not permitted" if it's not done in the same go:
+# https://github.com/meteor/meteor/issues/7852
+RUN echo "Extracting node and installing NPM version: $NPM_VERSION"
+RUN grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c -
+RUN tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /opt --no-same-owner \
+	&& ln -s /opt/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node \
+	&& /opt/node-v$NODE_VERSION-linux-x64/bin/npm install -g npm@$NPM_VERSION
 
 # Install Yarn
 RUN echo "Downloading Yarn version: $YARN_VERSION"
