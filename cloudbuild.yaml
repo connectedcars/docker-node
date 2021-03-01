@@ -1,10 +1,10 @@
 substitutions:
-  _NODE_VERSION_15: 15.8.0
-  _NODE_VERSION_14: 14.15.5
-  _NODE_VERSION_12: 12.20.2
-  _NODE_VERSION_10: 10.23.3
+  _NODE_VERSION_15: 15.10.0
+  _NODE_VERSION_14: 14.16.0
+  _NODE_VERSION_12: 12.21.0
+  _NODE_VERSION_10: 10.24.0
   _YARN_VERSION: 1.22.10
-  _NPM_VERSION: 7.5.4
+  _NPM_VERSION: 7.6.0
 steps:
   # copy build key to workspace
   - name: 'gcr.io/cloud-builders/gsutil'
