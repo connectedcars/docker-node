@@ -89,7 +89,13 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_12} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:12.x --build-arg=GITHUB_PAT=$$GITHUB_PAT fat-base/']
-images: 
+images:
+  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:16.x'
+  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_16}'
+  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:16.x'
+  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_16}'
+  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:16.x'
+  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_16}'
   - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:14.x'
   - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_14}'
   - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:14.x'
@@ -102,12 +108,6 @@ images:
   - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_12}'
   - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:12.x'
   - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_12}'
-  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:10.x'
-  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_10}'
-  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:10.x'
-  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_10}'
-  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:10.x'
-  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_10}'
 secrets:
 - kmsKeyName: projects/connectedcars-staging/locations/global/keyRings/cloudbuilder/cryptoKeys/connectedcars-builder
   secretEnv:
