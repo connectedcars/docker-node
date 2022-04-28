@@ -57,13 +57,13 @@ CMD npm start
 Encrypt key:
 
 ``` bash
-echo "<api key>" | gcloud kms encrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=cloudbuilder --key=containerbuilder|base64
+echo "<api key>" | gcloud kms encrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=cloudbuilder --key=connectedcars-builder|base64
 ```
 
 Test decryption:
 
 ``` bash
-echo "<encypted key>" | base64 -D | gcloud kms decrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=cloudbuilder --key=containerbuilder
+echo "<encypted key>" | base64 -D | gcloud kms decrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=cloudbuilder --key=connectedcars-builder
 ```
 
 ## Testing the build
