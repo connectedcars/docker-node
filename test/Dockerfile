@@ -20,8 +20,6 @@ RUN node -v
 RUN npm -v
 RUN yarn -v
 
-RUN npm run export
-
 RUN npm run id
 
 RUN ls -rl /tmp
