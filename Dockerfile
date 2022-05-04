@@ -20,11 +20,12 @@ RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
 	git \
 	openssh-client \
 	procps \
-    gnupg \
-    ca-certificates \
+	gnupg \
+	ca-certificates \
 	curl \
 	wget \
-    xz-utils \
+	mysql-server \
+	xz-utils \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /opt
@@ -36,7 +37,7 @@ RUN gpg --batch --yes --import /tmp/keys/*.gpg
 
 RUN echo "Downloading NodeJS version: $NODE_VERSION"
 RUN curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/node-v$NODE_VERSION-linux-x64.tar.xz" \
- 	&& curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
+	&& curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
 	&& gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc
 
 # Do npm upgrade in same step as it will fail with "EXDEV: cross-device link not permitted" if it's not done in the same go:
@@ -80,7 +81,7 @@ COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
 
 # Create user for node
 RUN groupadd --gid 1000 node \
-  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
+	&& useradd --uid 1000 --gid node --shell /bin/bash --create-home node
 
 RUN mkdir -p /app/tmp
 RUN chown node:node /app/tmp
@@ -113,8 +114,8 @@ RUN apt-get update -qq && \
 
 # Make sure we use mysql-server from Ubuntu 18.04
 RUN echo 'Package: mysql-server\n\
-Pin: release n=bionic\n\
-Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
+	Pin: release n=bionic\n\
+	Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
