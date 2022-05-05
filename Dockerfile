@@ -115,8 +115,7 @@ RUN apt-get update -qq && \
 	openssh-client \
 	software-properties-common \
 	&& \
-	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main" && \
-	rm -rf /var/lib/apt/lists/*
+	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main"
 
 # Make sure we use mysql-server from Ubuntu 18.04
 RUN echo 'Package: mysql-server\n\
@@ -124,6 +123,8 @@ RUN echo 'Package: mysql-server\n\
 	Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
 
 RUN apt-get install -y mysql-server
+
+RUN rm -rf /var/lib/apt/lists/*
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
