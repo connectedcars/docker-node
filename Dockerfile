@@ -114,7 +114,6 @@ RUN apt-get update -qq && \
 	ca-certificates \
 	openssh-client \
 	software-properties-common \
-	mysql-server \
 	&& \
 	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main" && \
 	rm -rf /var/lib/apt/lists/*
@@ -123,6 +122,8 @@ RUN apt-get update -qq && \
 RUN echo 'Package: mysql-server\n\
 	Pin: release n=bionic\n\
 	Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
+
+RUN apt-get install -y mysql-server
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
