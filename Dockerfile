@@ -24,7 +24,6 @@ RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
 	ca-certificates \
 	curl \
 	wget \
-	mysql-server \
 	xz-utils \
 	&& rm -rf /var/lib/apt/lists/*
 
@@ -108,7 +107,15 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 RUN apt-get update -qq && \
 	apt-get dist-upgrade -qq -y --no-install-recommends && \
-	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates openssh-client software-properties-common && \
+	apt-get install -qq -y --no-install-recommends \
+	build-essential \
+	python \
+	git \
+	ca-certificates \
+	openssh-client \
+	software-properties-common \
+	mysql-server \
+	&& \
 	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main" && \
 	rm -rf /var/lib/apt/lists/*
 
