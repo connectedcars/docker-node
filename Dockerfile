@@ -4,6 +4,8 @@ ARG YARN_VERSION=1.6.0
 
 FROM ubuntu:20.04 as downloader
 
+ARG TARGETPLATFORM
+
 # Import
 ARG NODE_VERSION
 ARG YARN_VERSION
@@ -35,17 +37,31 @@ COPY keys/*.gpg /tmp/keys/
 RUN gpg --batch --yes --import /tmp/keys/*.gpg
 
 RUN echo "Downloading NodeJS version: $NODE_VERSION"
-RUN curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/node-v$NODE_VERSION-linux-x64.tar.xz" \
+
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+    	echo AMD64; \
+    	NODE_TAR_NAME="node-v$NODE_VERSION-linux-x64"; \
+	elif [ "$TARGETPLATFORM" = "linux/arm64/v8" ]; then \
+		echo ARM64; \
+		NODE_TAR_NAME="node-v$NODE_VERSION-linux-arm64"; \
+	else \
+		echo unsupported targetplatform ${TARGETPLATFORM}; \
+		exit 1; \
+	fi; \
+	curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/$NODE_TAR_NAME.tar.xz" \
  	&& curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
-	&& gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc
+		&& gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
+		&& echo "Extracting node and installing NPM version: $NPM_VERSION" \
+		&& grep " $NODE_TAR_NAME.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
+		&& tar -xJf "$NODE_TAR_NAME.tar.xz" -C /opt --no-same-owner \
+		&& mv /opt/$NODE_TAR_NAME /opt/node-v$NODE_VERSION \
+		&& ln -s /opt/node-v$NODE_VERSION/bin/node /usr/local/bin/node
+
+RUN ls -l /opt/
 
 # Do npm upgrade in same step as it will fail with "EXDEV: cross-device link not permitted" if it's not done in the same go:
 # https://github.com/meteor/meteor/issues/7852
-RUN echo "Extracting node and installing NPM version: $NPM_VERSION"
-RUN grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c -
-RUN tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /opt --no-same-owner \
-	&& ln -s /opt/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node \
-	&& /opt/node-v$NODE_VERSION-linux-x64/bin/npm install -g npm@$NPM_VERSION
+RUN /opt/node-v$NODE_VERSION/bin/npm install -g npm@$NPM_VERSION
 
 # Install Yarn
 RUN echo "Downloading Yarn version: $YARN_VERSION"
@@ -72,7 +88,7 @@ RUN apt-get update -qq && \
 	rm -rf /var/lib/apt/lists/*
 
 # Copy over node
-COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
+COPY --from=downloader /opt/node-v$NODE_VERSION/ /usr/local
 RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
 # Copy over yarn
@@ -117,7 +133,7 @@ Pin: release n=bionic\n\
 Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
 
 # Copy over node
-COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
+COPY --from=downloader /opt/node-v$NODE_VERSION/ /usr/local
 RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
 # Copy over yarn
