@@ -10,12 +10,9 @@ steps:
   # Register qemu targets with linux
   - name: gcr.io/cloud-builders/docker
     args: ['run', '--rm', '--privileged', 'multiarch/qemu-user-static', '--reset', '-p', 'yes']
-  # Create a new builder that supports multi arch
+  # Create a new builder that supports multi arch and use this as instead
   - name: gcr.io/cloud-builders/docker
-    args: ['buildx', 'create', '--name', 'multi-arch-builder']
-  # Use multi arch builder as new default
-  - name: gcr.io/cloud-builders/docker
-    args: ['buildx', 'use', 'multi-arch-builder']
+    args: ['buildx', 'create', '--name', 'multi-arch-builder', '--use']
   # List build targets
   - name: 'gcr.io/cloud-builders/docker'
     args: ['buildx', 'inspect', '--bootstrap']
@@ -31,8 +28,15 @@ steps:
   #
   # Build base image
   - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=${_NODE_VERSION_18} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_18} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:18.x .']
+    args: ['buildx', 'build', '--platform=${_BUILD_PLATFORMS}',
+      '--target=base', 
+      '--build-arg=NODE_VERSION=${_NODE_VERSION_18}',
+      '--build-arg=NPM_VERSION=${_NPM_VERSION}',
+      '--build-arg=YARN_VERSION=${_YARN_VERSION}',
+      '--tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_18}', 
+      '--tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:18.x', 
+      '.'
+    ]
    # Build builder image
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
