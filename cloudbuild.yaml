@@ -6,6 +6,8 @@ substitutions:
   _YARN_VERSION: 1.22.19
   _NPM_VERSION: 8.16.0
 steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['buildx', 'ls']
   # copy build key to workspace
   - name: 'gcr.io/cloud-builders/gsutil'
     args: [
