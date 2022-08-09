@@ -1,7 +1,8 @@
 substitutions:
-  _NODE_VERSION_16: 16.14.2
-  _NODE_VERSION_14: 14.19.1
-  _NODE_VERSION_12: 12.22.11
+  _NODE_VERSION_18: 18.7.0
+  _NODE_VERSION_16: 16.16.0
+  _NODE_VERSION_14: 14.20.0
+  _NODE_VERSION_12: 12.22.12
   _YARN_VERSION: 1.22.17
   _NPM_VERSION: 8.5.5
 steps:
@@ -12,6 +13,35 @@ steps:
             'gs://connectedcars-staging-cloudbuilder-private/build.key',
             '.'
           ]
+  #
+  # node 18.x
+  #
+  # Build base image
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=${_NODE_VERSION_18} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_18} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:18.x .']
+   # Build builder image
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=${_NODE_VERSION_18} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_18} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:18.x .']
+  # Run test build
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_18} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_18} --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT --build-arg=NPM_TOKEN=$$NPM_TOKEN test/']
+    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
+  # Run test build
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker run test:${_NODE_VERSION_18}']
+  # Build fatbase
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_18} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_18} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:18.x fat-base/']
+  # Run test build - package json replace
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_18} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_18}-github-pat --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT --build-arg=NPM_TOKEN=$$NPM_TOKEN test/']
+    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
   #
   # node 16.x
   #
