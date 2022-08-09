@@ -4,14 +4,14 @@ ARG YARN_VERSION=1.6.0
 
 FROM ubuntu:20.04 as downloader
 
-ARG TARGETPLATFORM
-
 # Import
 ARG NODE_VERSION
 ARG YARN_VERSION
 ARG NPM_VERSION
+ARG TARGETOS
+ARG TARGETARCH
 
-RUN echo "Building downloader image with node version: ${NODE_VERSION}"
+RUN echo "Building downloader image with node version: ${NODE_VERSION} for $TARGETOS/${TARGETARCH}"
 
 # Disable color output and be less verbose
 ENV NO_COLOR=true
@@ -38,14 +38,14 @@ RUN gpg --batch --yes --import /tmp/keys/*.gpg
 
 RUN echo "Downloading NodeJS version: $NODE_VERSION"
 
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-    	echo AMD64; \
+RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
+    	echo Downloading amd64 binaies; \
     	NODE_TAR_NAME="node-v$NODE_VERSION-linux-x64"; \
-	elif [ "$TARGETPLATFORM" = "linux/arm64/v8" ]; then \
-		echo ARM64; \
+	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
+		echo Downloading arm64 binaies; \
 		NODE_TAR_NAME="node-v$NODE_VERSION-linux-arm64"; \
 	else \
-		echo unsupported targetplatform ${TARGETPLATFORM}; \
+		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
 		exit 1; \
 	fi; \
 	curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/$NODE_TAR_NAME.tar.xz" \
