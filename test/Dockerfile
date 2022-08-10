@@ -28,6 +28,8 @@ ENV GIT_SSH_COMMAND "ssh -v"
 
 RUN id
 
+RUN uname -a
+
 RUN npm install
 
 RUN npm test
