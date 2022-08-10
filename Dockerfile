@@ -127,6 +127,21 @@ RUN apt-get update -qq && \
 	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main" && \
 	rm -rf /var/lib/apt/lists/*
 
+ARG TARGETOS
+ARG TARGETARCH
+
+RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
+    	echo Downloading amd64 binaies; \
+    	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main"; \
+	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
+		echo Downloading arm64 binaies; \
+		add-apt-repository "deb http://ports.ubuntu.com/ubuntu-ports bionic main"; \
+	else \
+		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
+		exit 1; \
+	fi;
+RUN 
+
 # Make sure we use mysql-server from Ubuntu 18.04
 RUN echo 'Package: mysql-server\n\
 Pin: release n=bionic\n\
