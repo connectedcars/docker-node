@@ -37,7 +37,6 @@ for NODE_VERSION in $NODE_VERSIONS; do
     
     DOCKER_NODE_BUILD_ARGS="--build-arg=NODE_VERSION=${NODE_VERSION} --build-arg=NPM_VERSION=${NPM_VERSION} --build-arg=YARN_VERSION=${YARN_VERSION}"
     DOCKER_TEST_BUILD_ARGS="--build-arg=NODE_VERSION=${NODE_VERSION} --build-arg=NPM_TOKEN=${BUILD_NPM_TOKEN} --build-arg=BRANCH_NAME=${BUILD_BRANCH_NAME}"
-    DOCKER_FAT_BUILD_ARGS=" --build-arg=NODE_VERSION=${NODE_VERSION} --build-arg=BRANCH_NAME=${BUILD_BRANCH_NAME}"
 
     # Build image cache for all platforms so it's ready
     echo "Building node $NODE_VERSION images for $BUILD_PLATFORMS";
@@ -56,18 +55,23 @@ for NODE_VERSION in $NODE_VERSIONS; do
         docker run --platform=${PLATFORM} test:${NODE_VERSION}
     done
 
-    echo "Building fat-base image for node $NODE_VERSION for $BUILD_PLATFORMS";
-    # TODO: Merge into main dockerimage as we can't build this without pushing to the master repo
-
     if [[ -n "$BUILD_PUSH" ]]; then
-        echo Push images
-        docker buildx build --platform=${DOCKER_PLATFORMS} --progress=plain ${DOCKER_NODE_BUILD_ARGS} --push \
+        echo Push base images
+        docker buildx build --platform=${DOCKER_PLATFORMS} --progress=plain --target=base ${DOCKER_NODE_BUILD_ARGS} --push \
         --tag=gcr.io/${BUILD_PROJECT_ID}/node-base.${BUILD_BRANCH_NAME}:${NODE_VERSION} \
         --tag=gcr.io/${BUILD_PROJECT_ID}/node-base.${BUILD_BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
+        .
+
+        echo Push builder images
+        docker buildx build --platform=${DOCKER_PLATFORMS} --progress=plain --target=base ${DOCKER_NODE_BUILD_ARGS} --push \
         --tag=gcr.io/${BUILD_PROJECT_ID}/node-builder.${BUILD_BRANCH_NAME}:$NODE_VERSION.x \
         --tag=gcr.io/${BUILD_PROJECT_ID}/node-builder.${BUILD_BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
-        .    
-        # --tag=gcr.io/${BUILD_PROJECT_ID}/node-fat-base.${BUILD_BRANCH_NAME}:${NODE_VERSION} \
-        # --tag=gcr.io/${BUILD_PROJECT_ID}/node-fat-base.${BUILD_BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
+        .
+
+        echo Push fat-base images
+        docker buildx build --platform=${DOCKER_PLATFORMS} --progress=plain --target=base ${DOCKER_NODE_BUILD_ARGS} --push \
+        --tag=gcr.io/${BUILD_PROJECT_ID}/node-fat-base.${BUILD_BRANCH_NAME}:${NODE_VERSION} \
+        --tag=gcr.io/${BUILD_PROJECT_ID}/node-fat-base.${BUILD_BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
+        .  
     fi
 done

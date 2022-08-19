@@ -17,9 +17,9 @@ steps:
           ]
   # Build all images
   - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', './build-all.sh']
-    secretEnv: ["NPM_TOKEN"]
+    entrypoint: './build-all.sh'
+    env: ['BRANCH_NAME=${BRANCH_NAME}','PROJECT_ID=${PROJECT_ID}']
+    secretEnv: ['NPM_TOKEN']
     timeout: 2400s
 secrets:
 - kmsKeyName: projects/connectedcars-staging/locations/global/keyRings/cloudbuilder/cryptoKeys/connectedcars-builder
