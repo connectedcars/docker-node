@@ -9,6 +9,7 @@ BUILD_PLATFORMS='linux/amd64 linux/arm64'
 BUILD_PROJECT_ID=${PROJECT_ID:-}
 BUILD_NPM_TOKEN=${NPM_TOKEN:-}
 BUILD_BRANCH_NAME=${BRANCH_NAME:-}
+BUILD_PUSH=${PUSH:-}
 
 if [[ ! -n "$BUILD_PROJECT_ID" ]]; then
     echo "PROJECT_ID needs to be set"
@@ -58,14 +59,15 @@ for NODE_VERSION in $NODE_VERSIONS; do
     echo "Building fat-base image for node $NODE_VERSION for $BUILD_PLATFORMS";
     # TODO: Merge into main dockerimage as we can't build this without pushing to the master repo
 
-    
-    echo Push images
-    docker buildx build --platform=${DOCKER_PLATFORMS} --progress=plain ${DOCKER_NODE_BUILD_ARGS} --push \
-    --tag=gcr.io/${BUILD_PROJECT_ID}/node-base.${BUILD_BRANCH_NAME}:${NODE_VERSION} \
-    --tag=gcr.io/${BUILD_PROJECT_ID}/node-base.${BUILD_BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
-    --tag=gcr.io/${BUILD_PROJECT_ID}/node-builder.${BUILD_BRANCH_NAME}:$NODE_VERSION.x \
-    --tag=gcr.io/${BUILD_PROJECT_ID}/node-builder.${BUILD_BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
-    .
-    # --tag=gcr.io/${BUILD_PROJECT_ID}/node-fat-base.${BUILD_BRANCH_NAME}:${NODE_VERSION} \
-    # --tag=gcr.io/${BUILD_PROJECT_ID}/node-fat-base.${BUILD_BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
+    if [[ -n "$BUILD_PUSH" ]]; then
+        echo Push images
+        docker buildx build --platform=${DOCKER_PLATFORMS} --progress=plain ${DOCKER_NODE_BUILD_ARGS} --push \
+        --tag=gcr.io/${BUILD_PROJECT_ID}/node-base.${BUILD_BRANCH_NAME}:${NODE_VERSION} \
+        --tag=gcr.io/${BUILD_PROJECT_ID}/node-base.${BUILD_BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
+        --tag=gcr.io/${BUILD_PROJECT_ID}/node-builder.${BUILD_BRANCH_NAME}:$NODE_VERSION.x \
+        --tag=gcr.io/${BUILD_PROJECT_ID}/node-builder.${BUILD_BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
+        .    
+        # --tag=gcr.io/${BUILD_PROJECT_ID}/node-fat-base.${BUILD_BRANCH_NAME}:${NODE_VERSION} \
+        # --tag=gcr.io/${BUILD_PROJECT_ID}/node-fat-base.${BUILD_BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
+    fi
 done

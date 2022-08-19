@@ -24,6 +24,5 @@ steps:
 secrets:
 - kmsKeyName: projects/connectedcars-staging/locations/global/keyRings/cloudbuilder/cryptoKeys/connectedcars-builder
   secretEnv:
-    GITHUB_PAT: CiQAg7wCPfO2Tf9mtZoFWjAtX7whQ481af3gyGdM9WNK26B74UkSUQBefMgeHNh0KTsGybKReXDsFcbmed7f5sw97zSe9cswpKogENM5Ye0jiIu6NfebUpCnmJ9HVHmD/yBknlW4nn1VXBs7HYGiBSFZ52i2HyEopw==
     NPM_TOKEN: CiQAg7wCPTQtGU4lDlteqQWahMhUcvH2pwDWOPaT3ZpFKei4yj4SUgBefMgeT52oO+OFIHJFMIPFJLTZ7fWStqGIWrvAxzKhVTIm7UgFR/WhVoG0nAQ/qCu3QbOCsRz+JGvBuvRKh90K4C1GIyBbDuBTuVN4rxCrkBg=
 timeout: 4800s
