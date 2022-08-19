@@ -1,4 +1,6 @@
-set -eux
+#!/bin/sh
+
+set -eu
 
 NODE_VERSIONS="18.7.0"
 # 16.16.0 14.20.0 12.22.12"
