@@ -17,7 +17,8 @@ steps:
           ]
   # Build all images
   - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: './build-all.sh'
+    entrypoint: 'bash'
+    args: ['-c', './build-all.sh'],
     env: ['BRANCH_NAME=${BRANCH_NAME}','PROJECT_ID=${PROJECT_ID}']
     secretEnv: ['NPM_TOKEN']
     timeout: 2400s
