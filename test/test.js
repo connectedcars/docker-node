@@ -1,4 +1,4 @@
-const privateModule = require('private-module')
+const privateModule = require('@connectedcars/private-module')
 const expect = require('chai').expect;
 
 describe('test.js', () => {

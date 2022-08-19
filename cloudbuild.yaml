@@ -8,13 +8,6 @@ steps:
   # List build targets
   - name: 'gcr.io/cloud-builders/docker'
     args: ['buildx', 'inspect', '--bootstrap']
-  # copy build key to workspace
-  - name: 'gcr.io/cloud-builders/gsutil'
-    args: [
-            'cp',
-            'gs://connectedcars-staging-cloudbuilder-private/build.key',
-            '.'
-          ]
   # Build all images
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
