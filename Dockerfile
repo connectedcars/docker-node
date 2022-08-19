@@ -161,15 +161,10 @@ RUN npm config set unsafe-perm true
 RUN npm config set user root
 RUN npm config set group root
 
-# Setup github token injection wrappers for npm and yarn
-RUN npm install -g https://github.com/connectedcars/node-package-json-rewrite
-RUN mkdir -p /opt/connectedcars/bin
-RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/npm
-RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/yarn
-ENV PATH /opt/connectedcars/bin:$PATH
-
 # Read NPM token from environment variable
 RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
+# npm will bail if NPM_TOKEN is not set to a value, empty is fine
+ENV NPM_TOKEN=''
 
 # Fix for npm "prepare" not running under root
 RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builder
