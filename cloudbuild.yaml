@@ -1,11 +1,3 @@
-substitutions:
-  _NODE_VERSION_18: 18.7.0
-  _NODE_VERSION_16: 16.16.0
-  _NODE_VERSION_14: 14.20.0
-  _NODE_VERSION_12: 12.22.12
-  _YARN_VERSION: 1.22.19
-  _NPM_VERSION: 8.16.0
-  _BUILD_PLATFORMS: 'linux/amd64,linux/arm64'
 steps:
   # Register qemu targets with linux
   - name: gcr.io/cloud-builders/docker
@@ -23,141 +15,15 @@ steps:
             'gs://connectedcars-staging-cloudbuilder-private/build.key',
             '.'
           ]
-  #
-  # node 18.x
-  #
-  # Build base image
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['buildx', 'build', '--platform=${_BUILD_PLATFORMS}',
-      '--target=base', 
-      '--build-arg=NODE_VERSION=${_NODE_VERSION_18}',
-      '--build-arg=NPM_VERSION=${_NPM_VERSION}',
-      '--build-arg=YARN_VERSION=${_YARN_VERSION}',
-      '--tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_18}', 
-      '--tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:18.x', 
-      '.'
-    ]
-   # Build builder image
+  # Build all images
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=${_NODE_VERSION_18} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_18} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:18.x .']
-  # Run test build
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_18} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_18} --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT --build-arg=NPM_TOKEN=$$NPM_TOKEN test/']
-    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
-  # Run test build
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker run test:${_NODE_VERSION_18}']
-  # Build fatbase
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_18} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_18} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:18.x fat-base/']
-  # Run test build - package json replace
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_18} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_18}-github-pat --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT --build-arg=NPM_TOKEN=$$NPM_TOKEN test/']
-    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
-  #
-  # node 16.x
-  #
-  # Build base image
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=${_NODE_VERSION_16} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_16} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:16.x .']
-   # Build builder image
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=${_NODE_VERSION_16} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_16} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:16.x .']
-  # Run test build
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_16} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_16} --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT --build-arg=NPM_TOKEN=$$NPM_TOKEN test/']
-    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
-  # Run test build
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker run test:${_NODE_VERSION_16}']
-  # Build fatbase
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_16} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_16} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:16.x fat-base/']
-  # Run test build - package json replace
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_16} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_16}-github-pat --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT --build-arg=NPM_TOKEN=$$NPM_TOKEN test/']
-    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
-  # node 14.x
-  #
-  # Build base image
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=${_NODE_VERSION_14} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_14} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:14.x .']
-  # Build builder image
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=${_NODE_VERSION_14} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_14} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:14.x .']
-  # Build test image as builder
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_14} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_14} --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT --build-arg=NPM_TOKEN=$$NPM_TOKEN test/']
-    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
-  # Run test build
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker run test:${_NODE_VERSION_14}']
-  # Build fatbase
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_14} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_14} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:14.x fat-base/']
-    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
-  #
-  # node 12.x
-  #
-  # Build base image
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --target base --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_12} --tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:12.x .']
-  # Build builder image
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --target builder --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=NPM_VERSION=${_NPM_VERSION} --build-arg=YARN_VERSION=${_YARN_VERSION} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_12} --tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:12.x .']
-  # Build test image as builder
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=test:${_NODE_VERSION_12} --build-arg=SSH_KEY_PASSWORD=$$GITHUB_PAT --build-arg=NPM_TOKEN=$$NPM_TOKEN test/']
-    secretEnv: ['GITHUB_PAT', "NPM_TOKEN"]
-  # Run test build
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker run test:${_NODE_VERSION_12}']
-  # Build fatbase
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=NODE_VERSION=${_NODE_VERSION_12} --build-arg=BRANCH_NAME=${BRANCH_NAME} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_12} --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:12.x --build-arg=GITHUB_PAT=$$GITHUB_PAT fat-base/']
-images:
-  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:16.x'
-  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_16}'
-  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:16.x'
-  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_16}'
-  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:16.x'
-  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_16}'
-  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:14.x'
-  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_14}'
-  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:14.x'
-  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_14}'
-  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:14.x'
-  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_14}'
-  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:12.x'
-  - 'gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${_NODE_VERSION_12}'
-  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:12.x'
-  - 'gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${_NODE_VERSION_12}'
-  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:12.x'
-  - 'gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${_NODE_VERSION_12}'
+    args: ['-c', './build-all.sh']
+    secretEnv: ["NPM_TOKEN"]
+    timeout: 2400s
 secrets:
 - kmsKeyName: projects/connectedcars-staging/locations/global/keyRings/cloudbuilder/cryptoKeys/connectedcars-builder
   secretEnv:
     GITHUB_PAT: CiQAg7wCPfO2Tf9mtZoFWjAtX7whQ481af3gyGdM9WNK26B74UkSUQBefMgeHNh0KTsGybKReXDsFcbmed7f5sw97zSe9cswpKogENM5Ye0jiIu6NfebUpCnmJ9HVHmD/yBknlW4nn1VXBs7HYGiBSFZ52i2HyEopw==
     NPM_TOKEN: CiQAg7wCPTQtGU4lDlteqQWahMhUcvH2pwDWOPaT3ZpFKei4yj4SUgBefMgeT52oO+OFIHJFMIPFJLTZ7fWStqGIWrvAxzKhVTIm7UgFR/WhVoG0nAQ/qCu3QbOCsRz+JGvBuvRKh90K4C1GIyBbDuBTuVN4rxCrkBg=
-timeout: 2400s
+timeout: 4800s

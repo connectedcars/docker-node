@@ -124,7 +124,6 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN apt-get update -qq && \
 	apt-get dist-upgrade -qq -y --no-install-recommends && \
 	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates openssh-client software-properties-common && \
-	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main" && \
 	rm -rf /var/lib/apt/lists/*
 
 ARG TARGETOS
@@ -187,8 +186,3 @@ RUN ssh-keyscan -t rsa github.com > /home/builder/.ssh/known_hosts
 RUN chown -R builder:builder /home/builder/.ssh
 RUN mkdir /root/.ssh
 RUN ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
-
-# Copy in the encypted ssh key
-COPY --chown=builder:builder build.key /home/builder
-RUN chmod 600 /home/builder/build.key
-ENV SSH_KEY_PATH=/home/builder/build.key
