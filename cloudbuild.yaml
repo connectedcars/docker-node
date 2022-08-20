@@ -14,11 +14,11 @@ steps:
     args: ['-c', './build-all.sh']
     env: ['BRANCH_NAME=${BRANCH_NAME}','PROJECT_ID=${PROJECT_ID}']
     secretEnv: ['NPM_TOKEN']
-    timeout: 2400s
+    timeout: 4800s
 secrets:
 - kmsKeyName: projects/connectedcars-staging/locations/global/keyRings/cloudbuilder/cryptoKeys/connectedcars-builder
   secretEnv:
     NPM_TOKEN: CiQAg7wCPTQtGU4lDlteqQWahMhUcvH2pwDWOPaT3ZpFKei4yj4SUgBefMgeT52oO+OFIHJFMIPFJLTZ7fWStqGIWrvAxzKhVTIm7UgFR/WhVoG0nAQ/qCu3QbOCsRz+JGvBuvRKh90K4C1GIyBbDuBTuVN4rxCrkBg=
 options:
   machineType: 'E2_HIGHCPU_32'
-timeout: 4800s
+timeout: 5800s
