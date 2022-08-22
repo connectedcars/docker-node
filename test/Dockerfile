@@ -28,6 +28,8 @@ RUN id
 
 RUN uname -a
 
+RUN export | sed 's/\(NPM_TOKEN=....\).*\(....\)/\1___\2/g'
+
 RUN npm install
 
 RUN npm test
