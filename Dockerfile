@@ -38,6 +38,8 @@ RUN gpg --batch --yes --import /tmp/keys/*.gpg
 
 RUN echo "Downloading NodeJS version: $NODE_VERSION"
 
+# Do npm upgrade in same step as it will fail with "EXDEV: cross-device link not permitted" if it's not done in the same go:
+# https://github.com/meteor/meteor/issues/7852
 RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
     	echo Downloading amd64 binaies; \
     	NODE_TAR_NAME="node-v$NODE_VERSION-linux-x64"; \
@@ -55,13 +57,8 @@ RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
 		&& grep " $NODE_TAR_NAME.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
 		&& tar -xJf "$NODE_TAR_NAME.tar.xz" -C /opt --no-same-owner \
 		&& mv /opt/$NODE_TAR_NAME /opt/node-v$NODE_VERSION \
-		&& ln -s /opt/node-v$NODE_VERSION/bin/node /usr/local/bin/node
-
-RUN ls -l /opt/
-
-# Do npm upgrade in same step as it will fail with "EXDEV: cross-device link not permitted" if it's not done in the same go:
-# https://github.com/meteor/meteor/issues/7852
-RUN /opt/node-v$NODE_VERSION/bin/npm install -g npm@$NPM_VERSION
+		&& ln -s /opt/node-v$NODE_VERSION/bin/node /usr/local/bin/node \
+		&& /opt/node-v$NODE_VERSION/bin/npm install -g npm@$NPM_VERSION
 
 # Install Yarn
 RUN echo "Downloading Yarn version: $YARN_VERSION"
