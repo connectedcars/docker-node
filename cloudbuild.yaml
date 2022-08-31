@@ -20,3 +20,5 @@ secrets:
   secretEnv:
     NPM_TOKEN: CiQAg7wCPRLVNzCKg+NMXRanl3WmpnMKu2t+ufAPuPXLEDgheDISUQBefMgeLbcPimMQUK7wQyKw0A+DYrzXBA2vdBHvs/9EcChdsQXsVeC3DMBgufqUP73TWL6aH3a94zyC1zuo1JzyBL+dsZIEl47l3eYW6nFK3A==
 timeout: 5800s
+options:
+  machineType: 'E2_HIGHCPU_32'
