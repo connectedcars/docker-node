@@ -1,3 +1,3 @@
-const privateModule = require('@connectedcars/private-module')
+const privateModule = require('private-module')
 
-console.log(`${privateModule()} ${process.arch}`)
+console.log(`${privateModule()}`)

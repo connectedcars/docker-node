@@ -4,6 +4,8 @@ ARG BRANCH_NAME=master
 FROM gcr.io/connectedcars-staging/node-builder.$BRANCH_NAME:$NODE_VERSION as builder
 
 ARG NPM_TOKEN=""
+ARG GITHUB_PAT
+ARG SSH_KEY_PASSWORD
 
 WORKDIR /app
 
@@ -25,10 +27,6 @@ RUN ls -rl /tmp
 ENV GIT_SSH_COMMAND "ssh -v"
 
 RUN id
-
-RUN uname -a
-
-RUN export | sed 's/\(NPM_TOKEN=....\).*\(....\)/\1___\2/g'
 
 RUN npm install
 
