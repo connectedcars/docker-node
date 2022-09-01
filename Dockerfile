@@ -8,8 +8,10 @@ FROM ubuntu:20.04 as downloader
 ARG NODE_VERSION
 ARG YARN_VERSION
 ARG NPM_VERSION
+ARG TARGETOS
+ARG TARGETARCH
 
-RUN echo "Building downloader image with node version: ${NODE_VERSION}"
+RUN echo "Building downloader image with node version: ${NODE_VERSION} for $TARGETOS/${TARGETARCH}"
 
 # Disable color output and be less verbose
 ENV NO_COLOR=true
@@ -35,17 +37,28 @@ COPY keys/*.gpg /tmp/keys/
 RUN gpg --batch --yes --import /tmp/keys/*.gpg
 
 RUN echo "Downloading NodeJS version: $NODE_VERSION"
-RUN curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/node-v$NODE_VERSION-linux-x64.tar.xz" \
- 	&& curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
-	&& gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc
 
 # Do npm upgrade in same step as it will fail with "EXDEV: cross-device link not permitted" if it's not done in the same go:
 # https://github.com/meteor/meteor/issues/7852
-RUN echo "Extracting node and installing NPM version: $NPM_VERSION"
-RUN grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c -
-RUN tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /opt --no-same-owner \
-	&& ln -s /opt/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node \
-	&& /opt/node-v$NODE_VERSION-linux-x64/bin/npm install -g npm@$NPM_VERSION
+RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
+    	echo Downloading amd64 binaies; \
+    	NODE_TAR_NAME="node-v$NODE_VERSION-linux-x64"; \
+	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
+		echo Downloading arm64 binaies; \
+		NODE_TAR_NAME="node-v$NODE_VERSION-linux-arm64"; \
+	else \
+		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
+		exit 1; \
+	fi; \
+	curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/$NODE_TAR_NAME.tar.xz" \
+ 	&& curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
+		&& gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
+		&& echo "Extracting node and installing NPM version: $NPM_VERSION" \
+		&& grep " $NODE_TAR_NAME.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
+		&& tar -xJf "$NODE_TAR_NAME.tar.xz" -C /opt --no-same-owner \
+		&& mv /opt/$NODE_TAR_NAME /opt/node-v$NODE_VERSION \
+		&& ln -s /opt/node-v$NODE_VERSION/bin/node /usr/local/bin/node \
+		&& /opt/node-v$NODE_VERSION/bin/npm install -g npm@$NPM_VERSION
 
 # Install Yarn
 RUN echo "Downloading Yarn version: $YARN_VERSION"
@@ -72,7 +85,7 @@ RUN apt-get update -qq && \
 	rm -rf /var/lib/apt/lists/*
 
 # Copy over node
-COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
+COPY --from=downloader /opt/node-v$NODE_VERSION/ /usr/local
 RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
 # Copy over yarn
@@ -108,8 +121,22 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN apt-get update -qq && \
 	apt-get dist-upgrade -qq -y --no-install-recommends && \
 	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates openssh-client software-properties-common && \
-	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main" && \
 	rm -rf /var/lib/apt/lists/*
+
+ARG TARGETOS
+ARG TARGETARCH
+
+RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
+    	echo Downloading amd64 binaies; \
+    	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main"; \
+	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
+		echo Downloading arm64 binaies; \
+		add-apt-repository "deb http://ports.ubuntu.com/ubuntu-ports bionic main"; \
+	else \
+		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
+		exit 1; \
+	fi;
+RUN 
 
 # Make sure we use mysql-server from Ubuntu 18.04
 RUN echo 'Package: mysql-server\n\
@@ -117,7 +144,7 @@ Pin: release n=bionic\n\
 Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
 
 # Copy over node
-COPY --from=downloader /opt/node-v$NODE_VERSION-linux-x64/ /usr/local
+COPY --from=downloader /opt/node-v$NODE_VERSION/ /usr/local
 RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
 # Copy over yarn
@@ -131,15 +158,10 @@ RUN npm config set unsafe-perm true
 RUN npm config set user root
 RUN npm config set group root
 
-# Setup github token injection wrappers for npm and yarn
-RUN npm install -g https://github.com/connectedcars/node-package-json-rewrite
-RUN mkdir -p /opt/connectedcars/bin
-RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/npm
-RUN ln -s /usr/local/bin/package-json-rewrite /opt/connectedcars/bin/yarn
-ENV PATH /opt/connectedcars/bin:$PATH
-
 # Read NPM token from environment variable
 RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
+# npm will bail if NPM_TOKEN is not set to a value, empty is fine
+ENV NPM_TOKEN=''
 
 # Fix for npm "prepare" not running under root
 RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builder
@@ -157,7 +179,23 @@ RUN chown -R builder:builder /home/builder/.ssh
 RUN mkdir /root/.ssh
 RUN ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
 
-# Copy in the encypted ssh key
-COPY --chown=builder:builder build.key /home/builder
-RUN chmod 600 /home/builder/build.key
-ENV SSH_KEY_PATH=/home/builder/build.key
+# Build fat base
+FROM base as fat-base
+
+USER root
+
+# Install lftp and openssh and dependencies for puppeteer (chromium)
+RUN apt-get update && apt-get -yq install openssh-client lftp \
+	gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 \
+	libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 \
+	libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 \
+	libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
+	ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget \
+	&& rm -rf /var/lib/apt/lists/*
+
+# Add Semler external ftp to known hosts
+RUN mkdir -p /home/node/.ssh
+RUN ssh-keyscan -t rsa semftpext01.semler.dk > /home/node/.ssh/known_hosts
+RUN chmod 644 /home/node/.ssh/known_hosts
+
+USER node
