@@ -10,7 +10,8 @@
   },
   "author": "Troels Liebe Bentsen <troels@connectedcars.dk>",
   "dependencies": {
-    "@connectedcars/private-module": "^0.0.3"
+    "private-module": "git+ssh://git@github.com/connectedcars/private-module.git",
+    "@connectedcars/private-module": "*"
   },
   "devDependencies": {
     "chai": "4.3.6",
