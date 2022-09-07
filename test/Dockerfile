@@ -24,6 +24,9 @@ RUN ls -rl /tmp
 
 ENV GIT_SSH_COMMAND "ssh -v"
 
+# Check if host key is working
+RUN (ssh -o "BatchMode yes" github.com 2>&1 || true) | grep 'Permission denied (publickey)'
+
 RUN id
 
 RUN uname -a

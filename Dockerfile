@@ -165,17 +165,8 @@ RUN groupadd --gid 1000 builder \
 RUN mkdir -p /app/tmp
 RUN chown -R builder:builder /app
 
-# Disable SSH host key verification
-# TODO: https://man.openbsd.org/ssh_config.5#GlobalKnownHostsFile
-ENV GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
-
-# Add github.com keys to to known_hosts as a fallback if the user overview GIT_SSH_COMMAND
-RUN mkdir /home/builder/.ssh
-RUN chown -R builder:builder /home/builder/.ssh
-RUN ssh-keyscan -t rsa github.com > /home/builder/.ssh/known_hosts
-RUN chown -R builder:builder /home/builder/.ssh
-RUN mkdir /root/.ssh
-RUN ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
+# Cache ssh host key verification for github.com
+RUN ssh-keyscan github.com > /etc/ssh/ssh_known_hosts
 
 # Build fat base
 FROM base as fat-base
