@@ -4,7 +4,6 @@ ARG YARN_VERSION=1.6.0
 
 FROM ubuntu:20.04 as downloader
 
-# Import
 ARG NODE_VERSION
 ARG YARN_VERSION
 ARG NPM_VERSION
@@ -104,7 +103,7 @@ RUN npm config set group root
 RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
 
 # npm will bail if NPM_TOKEN is not set to a value, empty is fine and original 
-# docker build is broken with setting ENV so we need to wrap the npm image 
+# docker build is broken with setting ENV so we need to wrap the npm command 
 # https://github.com/docker/cli/issues/3344
 COPY --chown=root:root files/opt/connectedcars/bin /opt/connectedcars/bin
 ENV PATH /opt/connectedcars/bin:$PATH
