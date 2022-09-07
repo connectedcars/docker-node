@@ -67,22 +67,23 @@ RUN curl -fSLO --compressed --fail "https://yarnpkg.com/downloads/$YARN_VERSION/
 RUN gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
 RUN tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ --no-same-owner
 
-FROM ubuntu:20.04 as base
+#
+# Build a common base image for both node-base and node-builder
+# 
+FROM ubuntu:20.04 as common
 
-# Import
 ARG NODE_VERSION
 ARG YARN_VERSION
 
-RUN echo "Building base image with node version: ${NODE_VERSION}"
-
-# Disable color output and be less verbose
-ENV NO_COLOR=true
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-
+# Make sure we run latest ubuntu and install some basic packages
 RUN apt-get update -qq && \
 	apt-get dist-upgrade -qq -y --no-install-recommends && \
 	apt-get install -qq -y --no-install-recommends ca-certificates && \
 	rm -rf /var/lib/apt/lists/*
+
+# Disable color output and be less verbose
+ENV NO_COLOR=true
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # Copy over node
 COPY --from=downloader /opt/node-v$NODE_VERSION/ /usr/local
@@ -91,10 +92,35 @@ RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 # Copy over yarn
 COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
 
+# Disable npm color output and be less verbose
+RUN npm config set color false
+
+# When running as root don't drop to directory user
+RUN npm config set unsafe-perm true
+RUN npm config set user root
+RUN npm config set group root
+
+# Read NPM token from environment variable
+RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
+
+# npm will bail if NPM_TOKEN is not set to a value, empty is fine and original 
+# docker build is broken with setting ENV so we need to wrap the npm image 
+# https://github.com/docker/cli/issues/3344
+COPY --chown=root:root files/opt/connectedcars/bin /opt/connectedcars/bin
+ENV PATH /opt/connectedcars/bin:$PATH
+
+#
+# Build node-base image
+#
+FROM common as base
+
+ARG NODE_VERSION
+
+RUN echo "Building base image with node version: ${NODE_VERSION}"
+
 # Create user for node
 RUN groupadd --gid 1000 node \
   && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
-
 RUN mkdir -p /app/tmp
 RUN chown node:node /app/tmp
 
@@ -103,28 +129,18 @@ USER node
 ENV NODE_ENV production
 WORKDIR /app
 
-# Disable color output and be less verbose
-RUN npm config set color false
+FROM common as builder
 
-FROM ubuntu:20.04 as builder
-
-# Import
 ARG NODE_VERSION
-ARG YARN_VERSION
+ARG TARGETOS
+ARG TARGETARCH
 
 RUN echo "Building builder image with node version: ${NODE_VERSION}"
 
-# Disable color output 
-ENV NO_COLOR=true
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-
+# Install basic build tools
 RUN apt-get update -qq && \
-	apt-get dist-upgrade -qq -y --no-install-recommends && \
-	apt-get install -qq -y --no-install-recommends build-essential python git ca-certificates openssh-client software-properties-common && \
+	apt-get install -qq -y --no-install-recommends build-essential python git openssh-client software-properties-common && \
 	rm -rf /var/lib/apt/lists/*
-
-ARG TARGETOS
-ARG TARGETARCH
 
 RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
     	echo Downloading amd64 binaies; \
@@ -143,32 +159,15 @@ RUN echo 'Package: mysql-server\n\
 Pin: release n=bionic\n\
 Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
 
-# Copy over node
-COPY --from=downloader /opt/node-v$NODE_VERSION/ /usr/local
-RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
-
-# Copy over yarn
-COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
-
-# Disable color output
-RUN npm config set color false
-
-# When running as root don't drop to directory user
-RUN npm config set unsafe-perm true
-RUN npm config set user root
-RUN npm config set group root
-
-# Read NPM token from environment variable
-RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
-# npm will bail if NPM_TOKEN is not set to a value, empty is fine
-ENV NPM_TOKEN=''
-
 # Fix for npm "prepare" not running under root
-RUN groupadd builder && useradd --no-log-init --create-home -r -g builder builder
+RUN groupadd --gid 1000 builder \
+  && useradd --uid 1000 --gid builder --no-log-init --shell /bin/bash --create-home builder
+
 RUN mkdir -p /app/tmp
 RUN chown -R builder:builder /app
 
 # Disable SSH host key verification
+# TODO: https://man.openbsd.org/ssh_config.5#GlobalKnownHostsFile
 ENV GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 # Add github.com keys to to known_hosts as a fallback if the user overview GIT_SSH_COMMAND
