@@ -70,5 +70,6 @@ echo "<encypted key>" | base64 -D | gcloud kms decrypt --plaintext-file=- --ciph
 
 ``` bash
 export NPM_TOKEN=yournpmtoken
-PROJECT_ID=connectedcars-staging BRANCH_NAME=master ./build-all.sh
+# Only build specific node version on arm64
+PROJECT_ID=connectedcars-staging NODE_VERSIONS="16.16.0" BUILD_PLATFORMS="linux/arm64" BRANCH_NAME=`git symbolic-ref --short -q HEAD` ./build-all.sh
 ```
