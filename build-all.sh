@@ -35,16 +35,16 @@ export PROGRESS_NO_TRUNC=1
 
 # This is all a bit wierd because dockers local image store does not handle multi-arch images so it can only point to one arch at a time
 # It should be fixed soonish https://github.com/docker/roadmap/issues/371 but right now we have to use buildx cache and build in some clear way to get it working
-for NODE_VERSION in $NODE_VERSIONS; do 
+for NODE_VERSION in $NODE_VERSIONS; do
     NODE_MAJOR_VERSION=$(echo $NODE_VERSION | cut -d. -f1)
-    
+
     DOCKER_NODE_BUILD_ARGS="--build-arg=NODE_VERSION=${NODE_VERSION} --build-arg=NPM_VERSION=${NPM_VERSION} --build-arg=YARN_VERSION=${YARN_VERSION}"
     DOCKER_TEST_BUILD_ARGS="--build-arg=NODE_VERSION=${NODE_VERSION} --build-arg=NPM_TOKEN=${NPM_TOKEN} --build-arg=BRANCH_NAME=${BRANCH_NAME}"
 
     # Build image cache for all platforms so it's ready
     echo "Building node $NODE_VERSION images for $BUILD_PLATFORMS";
     docker buildx build --platform=${DOCKER_PLATFORMS} --progress=plain ${DOCKER_NODE_BUILD_ARGS} .
-    
+
     # Build test images to see it work
     for PLATFORM in $BUILD_PLATFORMS; do
         echo "Load node $NODE_VERSION builder and base image into dockers image store for $PLATFORM"
@@ -55,7 +55,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         echo "Building test image for node $NODE_VERSION for $PLATFORM";
         docker buildx build --platform=${PLATFORM} --progress=plain ${DOCKER_TEST_BUILD_ARGS} --builder default --load --tag=test:${NODE_VERSION} test/
         echo docker buildx build --platform=${PLATFORM} --progress=plain ${DOCKER_TEST_BUILD_ARGS} --target=builder --builder default --load --tag=test-builder:${NODE_VERSION} test/
-        
+
         echo "Running test image for node $NODE_VERSION for $PLATFORM";
         docker run --platform=${PLATFORM} test:${NODE_VERSION}
     done
@@ -77,6 +77,6 @@ for NODE_VERSION in $NODE_VERSIONS; do
         docker buildx build --platform=${DOCKER_PLATFORMS} --progress=plain --target=fat-base ${DOCKER_NODE_BUILD_ARGS} --push \
         --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION} \
         --tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:$NODE_MAJOR_VERSION.x \
-        .  
+        .
     fi
 done

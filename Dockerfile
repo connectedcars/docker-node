@@ -41,8 +41,8 @@ RUN echo "Downloading NodeJS version: $NODE_VERSION"
 # Do npm upgrade in same step as it will fail with "EXDEV: cross-device link not permitted" if it's not done in the same go:
 # https://github.com/meteor/meteor/issues/7852
 RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
-    	echo Downloading amd64 binaies; \
-    	NODE_TAR_NAME="node-v$NODE_VERSION-linux-x64"; \
+		echo Downloading amd64 binaies; \
+		NODE_TAR_NAME="node-v$NODE_VERSION-linux-x64"; \
 	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
 		echo Downloading arm64 binaies; \
 		NODE_TAR_NAME="node-v$NODE_VERSION-linux-arm64"; \
@@ -51,7 +51,7 @@ RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
 		exit 1; \
 	fi; \
 	curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/$NODE_TAR_NAME.tar.xz" \
- 	&& curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
+	&& curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
 		&& gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
 		&& echo "Extracting node and installing NPM version: $NPM_VERSION" \
 		&& grep " $NODE_TAR_NAME.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
@@ -69,7 +69,7 @@ RUN tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ --no-same-owner
 
 #
 # Build a common base image for both node-base and node-builder
-# 
+#
 FROM ubuntu:20.04 as common
 
 ARG NODE_VERSION
@@ -143,8 +143,8 @@ RUN apt-get update -qq && \
 	rm -rf /var/lib/apt/lists/*
 
 RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
-    	echo Downloading amd64 binaies; \
-    	add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main"; \
+		echo Downloading amd64 binaies; \
+		add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main"; \
 	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
 		echo Downloading arm64 binaies; \
 		add-apt-repository "deb http://ports.ubuntu.com/ubuntu-ports bionic main"; \
@@ -152,7 +152,6 @@ RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
 		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
 		exit 1; \
 	fi;
-RUN 
 
 # Make sure we use mysql-server from Ubuntu 18.04
 RUN echo 'Package: mysql-server\n\
