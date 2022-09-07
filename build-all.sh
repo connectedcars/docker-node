@@ -30,6 +30,9 @@ fi
 
 DOCKER_PLATFORMS=$(echo $BUILD_PLATFORMS | sed "s/ /,/g")
 
+# buildkit sane defaults
+export PROGRESS_NO_TRUNC=1
+
 # This is all a bit wierd because dockers local image store does not handle multi-arch images so it can only point to one arch at a time
 # It should be fixed soonish https://github.com/docker/roadmap/issues/371 but right now we have to use buildx cache and build in some clear way to get it working
 for NODE_VERSION in $NODE_VERSIONS; do 
