@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if [[ ! -n "$NPM_TOKEN" ]]; then
+if [ ! -n "$NPM_TOKEN" ]; then
     export NPM_TOKEN=""
-fis
+fi
 
 exec /usr/local/bin/npx $@

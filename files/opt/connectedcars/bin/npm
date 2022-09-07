@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [[ ! -n "$NPM_TOKEN" ]]; then
+if [ ! -n "$NPM_TOKEN" ]; then
     export NPM_TOKEN=""
 fi
 
