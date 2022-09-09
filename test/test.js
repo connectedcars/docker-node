@@ -20,6 +20,7 @@ describe('test.js', () => {
         `
       )).map(r => `${r.Value}`)
       expect(databases).to.match(/^(5\.7|8\.)/)
+      expect(databases.indexOf('5.7.21')).to.equal(-1)
       mySqlClient.cleanup()
     } finally {
       mySqlClient.cleanup()
