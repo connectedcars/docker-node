@@ -141,21 +141,40 @@ RUN apt-get update -qq && \
 	apt-get install -qq -y --no-install-recommends build-essential python git openssh-client software-properties-common && \
 	rm -rf /var/lib/apt/lists/*
 
+# Make sure we use mysql-server from Ubuntu 18.04 as this is the last version with mysql 5.7
 RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
 		echo Downloading amd64 binaies; \
 		add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main"; \
+		add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic-security main"; \
 	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
 		echo Downloading arm64 binaies; \
 		add-apt-repository "deb http://ports.ubuntu.com/ubuntu-ports bionic main"; \
+		add-apt-repository "deb http://ports.ubuntu.com/ubuntu-ports bionic-security main"; \
 	else \
 		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
 		exit 1; \
 	fi;
-
-# Make sure we use mysql-server from Ubuntu 18.04
 RUN echo 'Package: mysql-server\n\
 Pin: release n=bionic\n\
 Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
+
+
+# Install mysql 5.7 and 8.x dependencies and download both version to /opt
+RUN apt-get update -qq && \
+	apt-get install -qq -y --no-install-recommends mysql-client-core-8.0 && \
+	apt-get install -qq -y --no-install-recommends $(apt-cache depends mysql-server-core-5.7 mysql-server-core-8.0 | grep Depends | sed "s/.*ends:\ //" | tr '\n' ' ') && \
+ 	apt-get download mysql-server-core-5.7 mysql-server-core-8.0 && \
+ 	dpkg-deb -x mysql-server-core-5.7_*.deb /opt/mysql-5.7 && \
+	dpkg-deb -x mysql-server-core-8.0_*.deb /opt/mysql-8.0 && \
+	rm -f mysql-server-core-*.deb && \
+	rm -rf /var/lib/apt/lists/*
+
+# Set environment variables where you can find mysqld
+ENV MYSQLD_57=/opt/mysql-5.7/usr/sbin/mysqld
+ENV MYSQLD_80=/opt/mysql-8.0/usr/sbin/mysqld
+ENV MYSQLD=${MYSQLD_57}
+# Add mysql 5.7 to path so builds not using environment will still work
+RUN ln -s /opt/mysql-5.7/usr/sbin/mysqld /usr/local/sbin
 
 # Fix for npm "prepare" not running under root
 RUN groupadd --gid 1000 builder \
