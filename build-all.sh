@@ -77,7 +77,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         .
 
         echo Push fat-base images
-        docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=fat-base "${DOCKER_NODE_BUILD_ARGS}" --push \
+        docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=fat-base ${DOCKER_NODE_BUILD_ARGS} --push \
         --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:$NODE_MAJOR_VERSION.x" \
         .
