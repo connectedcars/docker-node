@@ -37,6 +37,9 @@ RUN npm install
 
 RUN npm test
 
+# Install a binary dependency to see if gyp works
+RUN npm install --loglevel verbose node-expat
+
 FROM gcr.io/connectedcars-staging/node-base.$BRANCH_NAME:$NODE_VERSION
 
 WORKDIR /app
