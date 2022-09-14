@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 # gpg keys listed at https://github.com/nodejs/node#release-team
 NODE_KEYS="4ED778F539E3634C779C87C6D7062848A1AB005C
