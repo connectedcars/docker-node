@@ -2,7 +2,7 @@ ARG NODE_VERSION=16.0.0
 ARG NPM_VERSION=6.0.0
 ARG YARN_VERSION=1.6.0
 
-FROM ubuntu:22.04 as downloader
+FROM ubuntu:20.04 as downloader
 
 ARG NODE_VERSION
 ARG YARN_VERSION
@@ -69,7 +69,7 @@ RUN tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ --no-same-owner
 #
 # Build a common base image for both node-base and node-builder
 #
-FROM ubuntu:22.04 as common
+FROM ubuntu:20.04 as common
 
 ARG NODE_VERSION
 ARG YARN_VERSION
@@ -138,28 +138,26 @@ RUN echo "Building builder image with node version: ${NODE_VERSION}"
 
 # Install basic build tools
 RUN apt-get update -qq && \
-	apt-get install -qq -y --no-install-recommends build-essential python3 git openssh-client software-properties-common && \
+	apt-get install -qq -y --no-install-recommends build-essential python git openssh-client software-properties-common && \
 	rm -rf /var/lib/apt/lists/*
 
 # Make sure we use mysql-server from Ubuntu 18.04 as this is the last version with mysql 5.7
-COPY --chown=root:root files/etc/apt/trusted.gpg.d/ /etc/apt/trusted.gpg.d/
 RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
-		echo Addding bionic for amd64 binaies; \
+		echo Downloading amd64 binaies; \
 		add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main"; \
 		add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic-security main"; \
 	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
-		echo Addding bionic Downloading arm64 binaies; \
+		echo Downloading arm64 binaies; \
 		add-apt-repository "deb http://ports.ubuntu.com/ubuntu-ports bionic main"; \
 		add-apt-repository "deb http://ports.ubuntu.com/ubuntu-ports bionic-security main"; \
 	else \
 		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
 		exit 1; \
 	fi;
-
-
 RUN echo 'Package: mysql-server\n\
 Pin: release n=bionic\n\
 Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
+
 
 # Install mysql 5.7 and 8.x dependencies and download both version to /opt
 RUN apt-get update -qq && \
