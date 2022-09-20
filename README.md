@@ -73,3 +73,14 @@ export NPM_TOKEN=yournpmtoken
 # Only build specific node version on arm64
 PROJECT_ID=connectedcars-staging NODE_VERSIONS="16.16.0" BUILD_PLATFORMS="linux/arm64" COMMIT_SHA=ABCD1234 BRANCH_NAME=`git symbolic-ref --short -q HEAD` ./build-all.sh
 ```
+
+
+## Rollback to older version
+
+``` bash
+export OLD_SHA=abcd1234
+for NODE_VERSION in 18.7.0 16.16.0 14.20.0 12.22.12; do
+  NODE_MAJOR_VERSION=$(echo "$NODE_VERSION" | cut -d. -f1)
+  echo docker buildx imagetools create "gcr.io/connectedcars-staging/node-builder.master:${NODE_VERSION}-${OLD_SHA}" --tag "gcr.io/connectedcars-staging/node-builder.master:${NODE_MAJOR_VERSION}.x"
+done
+```
