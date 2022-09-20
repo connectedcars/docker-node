@@ -73,6 +73,8 @@ FROM ubuntu:22.04 as common
 
 ARG NODE_VERSION
 ARG YARN_VERSION
+ARG TARGETOS
+ARG TARGETARCH
 
 # Make sure we run latest ubuntu and install some basic packages
 RUN apt-get update -qq && \
@@ -108,6 +110,31 @@ RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
 COPY --chown=root:root files/opt/connectedcars/bin /opt/connectedcars/bin
 ENV PATH /opt/connectedcars/bin:$PATH
 
+# Make sure we can install mysql-server from Ubuntu 18.04 as this is the last
+# version with mysql 5.7, also pin mysql-server to Ubuntu 18.04 as we have 
+# some repos that install it expecting mysql 5.7
+COPY --chown=root:root files/etc/apt/ /etc/apt/
+RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
+		echo Addding bionic for amd64 binaies; \
+		rm -f /etc/apt/sources.list.d/bionic-ports.list; \
+	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
+		echo Addding bionic Downloading arm64 binaies; \
+		rm -f /etc/apt/sources.list.d/bionic.list; \
+	else \
+		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
+		exit 1; \
+	fi;
+
+# Install common libs from older ubuntu versions so most binaies would work
+RUN apt-get update -qq && \
+	apt-get install -qq -y --no-install-recommends libssl1.1 && \
+	rm -rf /var/lib/apt/lists/*
+
+# Work arround issues for older node versions:
+# https://github.com/nodejs/node/discussions/43184
+# https://nodejs.org/en/blog/vulnerability/july-2022-security-releases/#dll-hijacking-on-windows-high-cve-2022-32223
+RUN sed -i 's/^providers = provider_sect.*/#&/' /etc/ssl/openssl.cnf
+
 #
 # Build node-base image
 #
@@ -131,37 +158,15 @@ WORKDIR /app
 FROM common as builder
 
 ARG NODE_VERSION
-ARG TARGETOS
-ARG TARGETARCH
 
 RUN echo "Building builder image with node version: ${NODE_VERSION}"
 
 # Install basic build tools
 RUN apt-get update -qq && \
-	apt-get install -qq -y --no-install-recommends build-essential python3 git openssh-client software-properties-common && \
+	apt-get install -qq -y --no-install-recommends build-essential python3 git openssh-client && \
 	rm -rf /var/lib/apt/lists/*
 
-# Make sure we use mysql-server from Ubuntu 18.04 as this is the last version with mysql 5.7
-COPY --chown=root:root files/etc/apt/trusted.gpg.d/ /etc/apt/trusted.gpg.d/
-RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
-		echo Addding bionic for amd64 binaies; \
-		add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic main"; \
-		add-apt-repository "deb http://mirrors.kernel.org/ubuntu/ bionic-security main"; \
-	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
-		echo Addding bionic Downloading arm64 binaies; \
-		add-apt-repository "deb http://ports.ubuntu.com/ubuntu-ports bionic main"; \
-		add-apt-repository "deb http://ports.ubuntu.com/ubuntu-ports bionic-security main"; \
-	else \
-		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
-		exit 1; \
-	fi;
-
-
-RUN echo 'Package: mysql-server\n\
-Pin: release n=bionic\n\
-Pin-Priority: 1001\n' > /etc/apt/preferences.d/mysql 
-
-# Install mysql 5.7 and 8.x dependencies and download both version to /opt
+# Install mysql 5.7 and 8.x dependencies and download both versions to /opt
 RUN apt-get update -qq && \
 	apt-get install -qq -y --no-install-recommends mysql-client-core-8.0 && \
 	apt-get install -qq -y --no-install-recommends $(apt-cache depends mysql-server-core-5.7 mysql-server-core-8.0 | grep Depends | sed "s/.*ends:\ //" | tr '\n' ' ') && \

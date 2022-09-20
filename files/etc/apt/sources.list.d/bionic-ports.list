@@ -1,0 +1,4 @@
+deb http://ports.ubuntu.com/ubuntu-ports bionic main
+# deb-src http://ports.ubuntu.com/ubuntu-ports bionic main
+deb http://ports.ubuntu.com/ubuntu-ports bionic-security main
+# deb-src http://ports.ubuntu.com/ubuntu-ports bionic-security main
