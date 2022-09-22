@@ -2,6 +2,7 @@
 
 set -eu
 
+NODE_LATEST="16.x"
 NODE_VERSIONS=${NODE_VERSIONS:="18.7.0 16.16.0 14.20.0 12.22.12"}
 YARN_VERSION=${YARN_VERSION:="1.22.19"}
 NPM_VERSION=${NPM_VERSION:="8.16.0"}
@@ -64,22 +65,34 @@ for NODE_VERSION in $NODE_VERSIONS; do
     done
 
     if [[ -n "$PUSH" ]]; then
+        TAG_BASE_LATEST=""
+        TAG_BUILDER_LATEST=""
+        TAG_FAT_BASE_LATEST=""
+        if [ "$NODE_MAJOR_VERSION" = "$NODE_LATEST" ]; then
+            TAG_BASE_LATEST="--tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:latest"
+            TAG_BUILDER_LATEST="--tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:latest"
+            TAG_FAT_BASE_LATEST="--tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:latest"
+        fi
+
         echo Push base images
         docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=base ${DOCKER_NODE_BUILD_ARGS} --push \
         --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:$NODE_MAJOR_VERSION.x" \
+        $TAG_BASE_LATEST \
         .
 
         echo Push builder images
         docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=builder ${DOCKER_NODE_BUILD_ARGS} --push \
         --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:$NODE_VERSION.x" \
         --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:$NODE_MAJOR_VERSION.x" \
+        $TAG_BUILDER_LATEST \
         .
 
         echo Push fat-base images
         docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=fat-base ${DOCKER_NODE_BUILD_ARGS} --push \
         --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:$NODE_MAJOR_VERSION.x" \
+        $TAG_FAT_BASE_LATEST \
         .
     fi
 done
