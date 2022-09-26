@@ -10,6 +10,7 @@ BUILD_PLATFORMS=${BUILD_PLATFORMS:='linux/amd64 linux/arm64'}
 # External variables
 PROJECT_ID=${PROJECT_ID:-}
 NPM_TOKEN=${NPM_TOKEN:-}
+COMMIT_SHA=${COMMIT_SHA:-}
 BRANCH_NAME=${BRANCH_NAME:-}
 PUSH=${PUSH:-}
 
@@ -20,6 +21,11 @@ fi
 
 if [[ ! -n "$NPM_TOKEN" ]]; then
     echo "NPM_TOKEN needs to be set"
+    exit 255
+fi
+
+if [[ ! -n "$COMMIT_SHA" ]]; then
+    echo "COMMIT_SHA needs to be set"
     exit 255
 fi
 
@@ -66,20 +72,23 @@ for NODE_VERSION in $NODE_VERSIONS; do
     if [[ -n "$PUSH" ]]; then
         echo Push base images
         docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=base ${DOCKER_NODE_BUILD_ARGS} --push \
+        --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_VERSION}" \
-        --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:$NODE_MAJOR_VERSION.x" \
+        --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
         .
 
         echo Push builder images
         docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=builder ${DOCKER_NODE_BUILD_ARGS} --push \
-        --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:$NODE_VERSION.x" \
-        --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:$NODE_MAJOR_VERSION.x" \
+        --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
+        --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_VERSION}" \
+        --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
         .
 
         echo Push fat-base images
         docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=fat-base ${DOCKER_NODE_BUILD_ARGS} --push \
+        --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}" \
-        --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:$NODE_MAJOR_VERSION.x" \
+        --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
         .
     fi
 done
