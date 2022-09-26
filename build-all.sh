@@ -2,7 +2,7 @@
 
 set -eu
 
-NODE_LATEST="16.x"
+NODE_STABLE="16"
 NODE_VERSIONS=${NODE_VERSIONS:="18.7.0 16.16.0 14.20.0 12.22.12"}
 YARN_VERSION=${YARN_VERSION:="1.22.19"}
 NPM_VERSION=${NPM_VERSION:="8.16.0"}
@@ -71,13 +71,14 @@ for NODE_VERSION in $NODE_VERSIONS; do
     done
 
     if [[ -n "$PUSH" ]]; then
-        TAG_BASE_LATEST=""
-        TAG_BUILDER_LATEST=""
-        TAG_FAT_BASE_LATEST=""
-        if [ "$NODE_MAJOR_VERSION" = "$NODE_LATEST" ]; then
-            TAG_BASE_LATEST="--tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:latest"
-            TAG_BUILDER_LATEST="--tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:latest"
-            TAG_FAT_BASE_LATEST="--tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:latest"
+        TAG_BASE_STABLE=""
+        TAG_BUILDER_STABLE=""
+        TAG_FAT_BASE_STABLE=""
+        echo  "$NODE_MAJOR_VERSION = $NODE_STABLE" 
+        if [ "$NODE_MAJOR_VERSION" = "$NODE_STABLE" ]; then
+            TAG_BASE_STABLE="--tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:stable"
+            TAG_BUILDER_STABLE="--tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:stable"
+            TAG_FAT_BASE_STABLE="--tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:stable"
         fi
 
         echo Push base images
@@ -85,7 +86,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
-        $TAG_BASE_LATEST \
+        $TAG_BASE_STABLE \
         .
 
         echo Push builder images
@@ -93,7 +94,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
-        $TAG_BUILDER_LATEST \
+        $TAG_BUILDER_STABLE \
         .
 
         echo Push fat-base images
@@ -101,7 +102,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
-        $TAG_FAT_BASE_LATEST \
+        $TAG_FAT_BASE_STABLE \
         .
     fi
 done
