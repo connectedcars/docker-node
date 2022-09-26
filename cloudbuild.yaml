@@ -12,7 +12,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args: ['-c', './build-all.sh']
-    env: ['BRANCH_NAME=${BRANCH_NAME}','PROJECT_ID=${PROJECT_ID}', 'PUSH=y']
+    env: ['COMMIT_SHA=${COMMIT_SHA}','BRANCH_NAME=${BRANCH_NAME}','PROJECT_ID=${PROJECT_ID}', 'PUSH=y']
     secretEnv: ['NPM_TOKEN']
     timeout: 7200s
 secrets:
