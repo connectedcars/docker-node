@@ -1,6 +1,6 @@
 # docker-node
 
-Docker Ubuntu 18.04 base image for node build and production:
+Ubuntu base image for node build and production:
 
 ## Example of usage:
 
@@ -22,7 +22,7 @@ secrets:
 Dockerfile:
 
 ``` docker
-ARG NODE_VERSION=10.x
+ARG NODE_VERSION=16.x
 
 FROM gcr.io/connectedcars-staging/node-builder.master:$NODE_VERSION as builder
 
