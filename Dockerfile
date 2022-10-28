@@ -212,4 +212,10 @@ RUN mkdir -p /home/node/.ssh
 RUN ssh-keyscan -t rsa semftpext01.semler.dk > /home/node/.ssh/known_hosts
 RUN chmod 644 /home/node/.ssh/known_hosts
 
+# Enable deprecated host key algorithm for Semler's ftp server
+RUN touch /home/node/.ssh/config
+RUN echo "Host semftpext01.semler.dk" >> /home/node/.ssh/config
+RUN echo "  HostKeyAlgorithms +ssh-rsa" >> /home/node/.ssh/config
+RUN chmod 644 /home/node/.ssh/config
+
 USER node
