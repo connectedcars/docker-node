@@ -4,4 +4,4 @@ if [ ! -n "$NPM_TOKEN" ]; then
     export NPM_TOKEN=""
 fi
 
-exec /usr/local/bin/npm $@
+exec /usr/local/bin/npm "$@"
