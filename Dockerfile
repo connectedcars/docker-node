@@ -179,9 +179,9 @@ RUN apt-get update -qq && \
 # Set environment variables where you can find mysqld
 ENV MYSQLD_57=/opt/mysql-5.7/usr/sbin/mysqld
 ENV MYSQLD_80=/opt/mysql-8.0/usr/sbin/mysqld
-ENV MYSQLD=${MYSQLD_57}
-# Add mysql 5.7 to path so builds not using environment will still work
-RUN ln -s /opt/mysql-5.7/usr/sbin/mysqld /usr/local/sbin
+ENV MYSQLD=${MYSQLD_80}
+# Add mysql 8.0 to path so builds not using environment will still work
+RUN ln -s /opt/mysql-8.0/usr/sbin/mysqld /usr/local/sbin
 
 # Fix for npm "prepare" not running under root
 RUN groupadd --gid 1000 builder \
