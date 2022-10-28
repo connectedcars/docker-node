@@ -4,4 +4,4 @@ if [ ! -n "$NPM_TOKEN" ]; then
     export NPM_TOKEN=""
 fi
 
-exec /usr/local/bin/npx $@
+exec /usr/local/bin/npx "$@"
