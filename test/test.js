@@ -10,6 +10,7 @@ describe('test.js', () => {
   
   it('should start mysqld and get the version with SQL', async () => {
     const mySqlServer = new MySQLServer()
+    console.log(JSON.stringify(await mySqlServer.getTimings(), null, 2))
     let mySqlClient
     try {
       mySqlClient = new MySQLClient({ port: await mySqlServer.getListenPort() })
@@ -26,5 +27,5 @@ describe('test.js', () => {
       mySqlClient.cleanup()
       mySqlServer.kill()
     }
-  }).timeout(60000);;
+  }).timeout(120000);;
 });
