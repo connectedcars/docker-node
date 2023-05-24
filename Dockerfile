@@ -49,10 +49,10 @@ RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
 		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
 		exit 1; \
 	fi; \
-	curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/$NODE_TAR_NAME.tar.xz" \
-	&& curl -sSLO --compressed --fail "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
+	curl -sSLO --fail "https://nodejs.org/dist/v${NODE_VERSION}/${NODE_TAR_NAME}.tar.xz" \
+	&& curl -sSLO --compressed --fail "https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt.asc" \
 		&& gpg -q --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
-		&& echo "Extracting node and installing NPM version: $NPM_VERSION" \
+		&& echo "Extracting node and installing NPM version: ${NPM_VERSION}" \
 		&& grep " $NODE_TAR_NAME.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
 		&& tar -xJf "$NODE_TAR_NAME.tar.xz" -C /opt --no-same-owner \
 		&& mv /opt/$NODE_TAR_NAME /opt/node-v$NODE_VERSION \
@@ -61,8 +61,8 @@ RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
 
 # Install Yarn
 RUN echo "Downloading Yarn version: $YARN_VERSION"
-RUN curl -fSLO --compressed --fail "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz"
-RUN curl -fSLO --compressed --fail "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc"
+RUN curl -fSLO --compressed --fail "https://yarnpkg.com/downloads/${YARN_VERSION}/yarn-v${YARN_VERSION}.tar.gz"
+RUN curl -fSLO --compressed --fail "https://yarnpkg.com/downloads/${YARN_VERSION}/yarn-v${YARN_VERSION}.tar.gz.asc"
 RUN gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
 RUN tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ --no-same-owner
 
@@ -114,14 +114,14 @@ ENV PATH /opt/connectedcars/bin:$PATH
 # version with mysql 5.7, also pin mysql-server to Ubuntu 18.04 as we have 
 # some repos that install it expecting mysql 5.7
 COPY --chown=root:root files/etc/apt/ /etc/apt/
-RUN if [ "$TARGETOS/${TARGETARCH}" = "linux/amd64" ]; then \
+RUN if [ "${TARGETOS}/${TARGETARCH}" = "linux/amd64" ]; then \
 		echo Addding bionic for amd64 binaies; \
 		rm -f /etc/apt/sources.list.d/bionic-ports.list; \
-	elif [ "$TARGETOS/${TARGETARCH}" = "linux/arm64" ]; then \
+	elif [ "${TARGETOS}/${TARGETARCH}" = "linux/arm64" ]; then \
 		echo Addding bionic Downloading arm64 binaies; \
 		rm -f /etc/apt/sources.list.d/bionic.list; \
 	else \
-		echo "Unsupported target os and platform $TARGETOS/${TARGETARCH}"; \
+		echo "Unsupported target os and platform ${TARGETOS}/${TARGETARCH}"; \
 		exit 1; \
 	fi;
 
