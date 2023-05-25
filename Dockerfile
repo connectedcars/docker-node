@@ -96,11 +96,6 @@ COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
 # Disable npm color output and be less verbose
 RUN npm config set color false
 
-# When running as root don't drop to directory user
-RUN npm config set unsafe-perm true
-RUN npm config set user root
-RUN npm config set group root
-
 # Read NPM token from environment variable
 RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
 
