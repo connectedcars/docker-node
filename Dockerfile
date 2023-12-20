@@ -103,7 +103,7 @@ RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
 
 # Disable npm color output and be less verbose
-RUN npm config set color false
+RUN npm config set color false --global
 
 # Read NPM token from environment variable
 RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
