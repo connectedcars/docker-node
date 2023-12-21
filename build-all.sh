@@ -66,7 +66,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         echo "Building test image with buildx for node $NODE_VERSION for $PLATFORM"
         docker images
         docker buildx ls
-        docker buildx build --instance=default --platform="${PLATFORM}" --progress=plain --load --tag="test:${NODE_VERSION}" --secret id=NPM_TOKEN --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" test/
+        docker buildx build --builder=default --platform="${PLATFORM}" --progress=plain --load --tag="test:${NODE_VERSION}" --secret id=NPM_TOKEN --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" test/
         echo "Running test image for node $NODE_VERSION for $PLATFORM"
         docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
     done
