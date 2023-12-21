@@ -64,10 +64,12 @@ for NODE_VERSION in $NODE_VERSIONS; do
         docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
 
         echo "Building test image with buildx for node $NODE_VERSION for $PLATFORM"
-        docker images
-        docker buildx ls
-        docker context ls
-        docker --context=default buildx build --platform="${PLATFORM}" --progress=plain --load --tag="test:${NODE_VERSION}" --secret id=NPM_TOKEN --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" test/
+        # For some reason the multi arch builder does not have access to the 
+        # local images on google cloud builds version of docker so we need 
+        # to use default to get this working. Also docker for mac no creates
+        # a desktop-linux context where you can't set builder so we need to
+        # also set the context for this to work there.
+        docker --context default buildx build --builder default --platform="${PLATFORM}" --progress=plain --load --tag="test:${NODE_VERSION}" --secret id=NPM_TOKEN --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" test/
         echo "Running test image for node $NODE_VERSION for $PLATFORM"
         docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
     done
