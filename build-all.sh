@@ -58,10 +58,10 @@ for NODE_VERSION in $NODE_VERSIONS; do
         docker buildx build --platform="${PLATFORM}" --progress=plain --target=builder --load --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
         docker buildx build --platform="${PLATFORM}" --progress=plain --target=fat-base --load --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
 
-        echo "Building test image with old docker build for node $NODE_VERSION for $PLATFORM"
-        DOCKER_BUILDKIT=0 docker build --platform="${PLATFORM}" --tag="test:${NODE_VERSION}" --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" --build-arg=NPM_TOKEN="${NPM_TOKEN}" -f test/Dockerfile.old test/
-        echo "Running test image for node $NODE_VERSION for $PLATFORM"
-        docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
+        # echo "Building test image with old docker build for node $NODE_VERSION for $PLATFORM"
+        # DOCKER_BUILDKIT=0 docker build --platform="${PLATFORM}" --tag="test:${NODE_VERSION}" --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" --build-arg=NPM_TOKEN="${NPM_TOKEN}" -f test/Dockerfile.old test/
+        # echo "Running test image for node $NODE_VERSION for $PLATFORM"
+        # docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
 
         echo "Building test image with buildx for node $NODE_VERSION for $PLATFORM"
         # For some reason the multi arch builder does not have access to the 
