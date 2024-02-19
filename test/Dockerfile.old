@@ -3,6 +3,8 @@ ARG BRANCH_NAME=master
 
 FROM gcr.io/connectedcars-staging/node-builder.$BRANCH_NAME:$NODE_VERSION as builder
 
+ARG NPM_TOKEN=""
+
 WORKDIR /app
 
 USER builder
@@ -31,9 +33,7 @@ RUN uname -a
 
 RUN export | sed 's/\(NPM_TOKEN=....\).*\(....\)/\1___\2/g'
 
-RUN --mount=type=ssh \
-    --mount=type=secret,id=NPM_TOKEN,uid=1000 \
-    secrets2env npm install
+RUN npm install
 
 RUN npm test
 

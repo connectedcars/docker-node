@@ -1,13 +1,6 @@
 steps:
-  # Register qemu targets with linux
-  - name: gcr.io/cloud-builders/docker
-    args: ['run', '--rm', '--privileged', 'multiarch/qemu-user-static', '--reset', '-p', 'yes']
-  # Create a new builder that supports multi arch and use this as instead
-  - name: gcr.io/cloud-builders/docker
-    args: ['buildx', 'create', '--name', 'multi-arch-builder', '--use']
-  # List build targets
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['buildx', 'inspect', '--bootstrap']
+  # Setup docker with buildkit and other fixes
+  - name: 'gcr.io/connectedcars-staging/cloud-build-init.master'
   # Build all images
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
