@@ -33,7 +33,7 @@ RUN export | sed 's/\(NPM_TOKEN=....\).*\(....\)/\1___\2/g'
 
 RUN --mount=type=ssh \
     --mount=type=secret,id=NPM_TOKEN,uid=1000 \
-    secrets2env npm install
+    secrets2env npm install --loglevel verbose node-expat
 
 RUN npm test
 
