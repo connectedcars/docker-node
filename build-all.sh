@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 NODE_STABLE="18"
 NODE_VERSIONS=${NODE_VERSIONS:="20.11.1 18.19.1"}
