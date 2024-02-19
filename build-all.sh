@@ -14,6 +14,7 @@ NPM_TOKEN=${NPM_TOKEN:-}
 COMMIT_SHA=${COMMIT_SHA:-}
 BRANCH_NAME=${BRANCH_NAME:-}
 PUSH=${PUSH:-}
+GCP_CLOUD_BUILD=${GCP_CLOUD_BUILD:="n"}
 
 if [[ ! -n "$PROJECT_ID" ]]; then
     echo "PROJECT_ID needs to be set"
@@ -60,7 +61,11 @@ for NODE_VERSION in $NODE_VERSIONS; do
         docker buildx build --platform="${PLATFORM}" --progress=plain --target=fat-base --load --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
 
         echo "Building test image with old docker build for node $NODE_VERSION for $PLATFORM"
-        DOCKER_BUILDKIT=0 docker build --platform="${PLATFORM}" --progress=plain --tag="test:${NODE_VERSION}" ${DOCKER_TEST_BUILD_ARGS} test/
+        if [[ "$GCP_CLOUD_BUILD" = "y" ]]; then
+          DOCKER_BUILDKIT=0 docker build --network cloudbuild --platform="${PLATFORM}" --progress=plain --tag="test:${NODE_VERSION}" ${DOCKER_TEST_BUILD_ARGS} test/
+        else 
+          DOCKER_BUILDKIT=0 docker build --platform="${PLATFORM}" --progress=plain --tag="test:${NODE_VERSION}" ${DOCKER_TEST_BUILD_ARGS} test/
+        fi
         echo "Running test image for node $NODE_VERSION for $PLATFORM"
         docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
 
