@@ -54,9 +54,9 @@ for NODE_VERSION in $NODE_VERSIONS; do
     # Build test images to see it work
     for PLATFORM in $BUILD_PLATFORMS; do
         echo "Load node $NODE_VERSION builder and base image into dockers image store for $PLATFORM"
-        docker buildx build --platform="${PLATFORM}" --progress=plain --target=base --load --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
-        docker buildx build --platform="${PLATFORM}" --progress=plain --target=builder --load --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
-        docker buildx build --platform="${PLATFORM}" --progress=plain --target=fat-base --load --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
+        docker buildx build --platform="${PLATFORM}" --progress=plain --target=base --load --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
+        docker buildx build --platform="${PLATFORM}" --progress=plain --target=builder --load --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
+        docker buildx build --platform="${PLATFORM}" --progress=plain --target=fat-base --load --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
 
         echo "Building test image with old docker build for node $NODE_VERSION for $PLATFORM"
         DOCKER_BUILDKIT=0 docker build --platform="${PLATFORM}" --tag="test:${NODE_VERSION}" --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" --build-arg=NPM_TOKEN="${NPM_TOKEN}" -f test/Dockerfile.old test/
@@ -80,32 +80,32 @@ for NODE_VERSION in $NODE_VERSIONS; do
         TAG_FAT_BASE_STABLE=""
         echo  "$NODE_MAJOR_VERSION = $NODE_STABLE" 
         if [ "$NODE_MAJOR_VERSION" = "$NODE_STABLE" ]; then
-            TAG_BASE_STABLE="--tag=gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:stable"
-            TAG_BUILDER_STABLE="--tag=gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:stable"
-            TAG_FAT_BASE_STABLE="--tag=gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:stable"
+            TAG_BASE_STABLE="--tag=europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:stable"
+            TAG_BUILDER_STABLE="--tag=europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:stable"
+            TAG_FAT_BASE_STABLE="--tag=europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:stable"
         fi
 
         echo Push base images
         docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=base ${DOCKER_NODE_BUILD_ARGS} --push \
-        --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
-        --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_VERSION}" \
-        --tag="gcr.io/${PROJECT_ID}/node-base.${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
+        --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
+        --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_VERSION}" \
+        --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
         $TAG_BASE_STABLE \
         .
 
         echo Push builder images
         docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=builder ${DOCKER_NODE_BUILD_ARGS} --push \
-        --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
-        --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_VERSION}" \
-        --tag="gcr.io/${PROJECT_ID}/node-builder.${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
+        --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
+        --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_VERSION}" \
+        --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
         $TAG_BUILDER_STABLE \
         .
 
         echo Push fat-base images
         docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --target=fat-base ${DOCKER_NODE_BUILD_ARGS} --push \
-        --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
-        --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_VERSION}" \
-        --tag="gcr.io/${PROJECT_ID}/node-fat-base.${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
+        --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
+        --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_VERSION}" \
+        --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
         $TAG_FAT_BASE_STABLE \
         .
     fi
