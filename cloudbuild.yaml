@@ -1,6 +1,6 @@
 steps:
   # Setup docker with buildkit and other fixes
-  - name: 'europe-west1-docker.pkg.dev/connectedcars-build/cloud-build-init/master'
+  - name: 'gcr.io/connectedcars-staging/cloud-build-init.master'
   # Build all images
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
