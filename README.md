@@ -10,9 +10,9 @@ cloudbuilder.yaml:
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker build --build-arg=GITHUB_PAT=$$GITHUB_PAT --tag="gcr.io/$PROJECT_ID/$REPO_NAME.$BRANCH_NAME:$COMMIT_SHA" .']
+    args: ['-c', 'docker build --build-arg=GITHUB_PAT=$$GITHUB_PAT --tag="europe-west1-docker.pkg.dev/connectedcars-build/$REPO_NAME/$BRANCH_NAME:$COMMIT_SHA" .']
     secretEnv: ['GITHUB_PAT']
-images: ['gcr.io/$PROJECT_ID/$REPO_NAME.$BRANCH_NAME:$COMMIT_SHA']
+images: ['europe-west1-docker.pkg.dev/connectedcars-build/$REPO_NAME/$BRANCH_NAME:$COMMIT_SHA']
 secrets:
 - kmsKeyName: projects/[Your project name]/locations/global/keyRings/cloudbuilder/cryptoKeys/[Your key name]
   secretEnv:
@@ -24,7 +24,7 @@ Dockerfile:
 ``` docker
 ARG NODE_VERSION=16.x
 
-FROM gcr.io/connectedcars-staging/node-builder.master:$NODE_VERSION as builder
+FROM europe-west1-docker.pkg.dev/connectedcars-build/node-builder/master:$NODE_VERSION as builder
 
 ARG GITHUB_PAT
 
@@ -37,7 +37,7 @@ RUN npm install
 
 RUN npm test
 
-FROM gcr.io/connectedcars-staging/node-base.master:$NODE_VERSION
+FROM europe-west1-docker.pkg.dev/connectedcars-build/node-base/master:$NODE_VERSION
 
 USER nobody
 
@@ -81,6 +81,6 @@ PROJECT_ID=connectedcars-staging NODE_VERSIONS="20.8.1" BUILD_PLATFORMS="linux/a
 export OLD_SHA=abcd1234
 for NODE_VERSION in 18.7.0 16.16.0 14.20.0 12.22.12; do
   NODE_MAJOR_VERSION=$(echo "$NODE_VERSION" | cut -d. -f1)
-  echo docker buildx imagetools create "gcr.io/connectedcars-staging/node-builder.master:${NODE_VERSION}-${OLD_SHA}" --tag "gcr.io/connectedcars-staging/node-builder.master:${NODE_MAJOR_VERSION}.x"
+  echo docker buildx imagetools create "europe-west1-docker.pkg.dev/connectedcars-build/node-builder/master:${NODE_VERSION}-${OLD_SHA}" --tag "europe-west1-docker.pkg.dev/connectedcars-build/node-builder/master:${NODE_MAJOR_VERSION}.x"
 done
 ```
