@@ -1,17 +1,23 @@
 steps:
   # Setup docker with buildkit and other fixes
-  - name: 'europe-west1-docker.pkg.dev/connectedcars-build/cloud-build-init/master'
+  - name: "europe-west1-docker.pkg.dev/connectedcars-build/cloud-build-init/master"
   # Build all images
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args: ['-c', './build-all.sh']
-    env: ['COMMIT_SHA=${COMMIT_SHA}','BRANCH_NAME=${BRANCH_NAME}','PROJECT_ID=${PROJECT_ID}', 'PUSH=y']
-    secretEnv: ['NPM_TOKEN']
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "./build-all.sh"]
+    env:
+      [
+        "COMMIT_SHA=${COMMIT_SHA}",
+        "BRANCH_NAME=${BRANCH_NAME}",
+        "PROJECT_ID=${PROJECT_ID}",
+        "PUSH=y",
+      ]
+    secretEnv: ["NPM_TOKEN"]
     timeout: 14400s
 secrets:
-- kmsKeyName: projects/connectedcars-staging/locations/global/keyRings/cloudbuilder/cryptoKeys/connectedcars-builder
-  secretEnv:
-    NPM_TOKEN: CiQAg7wCPRLVNzCKg+NMXRanl3WmpnMKu2t+ufAPuPXLEDgheDISUQBefMgeLbcPimMQUK7wQyKw0A+DYrzXBA2vdBHvs/9EcChdsQXsVeC3DMBgufqUP73TWL6aH3a94zyC1zuo1JzyBL+dsZIEl47l3eYW6nFK3A==
+  - kmsKeyName: projects/connectedcars-staging/locations/global/keyRings/cloudbuilder/cryptoKeys/connectedcars-builder
+    secretEnv:
+      NPM_TOKEN: CiQAg7wCPRLVNzCKg+NMXRanl3WmpnMKu2t+ufAPuPXLEDgheDISUQBefMgeLbcPimMQUK7wQyKw0A+DYrzXBA2vdBHvs/9EcChdsQXsVeC3DMBgufqUP73TWL6aH3a94zyC1zuo1JzyBL+dsZIEl47l3eYW6nFK3A==
 timeout: 14460s
 options:
-  machineType: 'E2_HIGHCPU_32'
+  machineType: "E2_HIGHCPU_32"
