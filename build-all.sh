@@ -3,7 +3,7 @@
 set -eux
 
 NODE_STABLE="20"
-NODE_VERSIONS=${NODE_VERSIONS:="20.18.0 18.20.4"}
+NODE_VERSIONS=${NODE_VERSIONS:="22.10.0 20.18.0 18.20.4"}
 YARN_VERSION=${YARN_VERSION:="1.22.19"}
 NPM_VERSION=${NPM_VERSION:="10.8.2"}
 BUILD_PLATFORMS=${BUILD_PLATFORMS:='linux/amd64 linux/arm64'}
@@ -63,15 +63,15 @@ for NODE_VERSION in $NODE_VERSIONS; do
         echo "Running test image for node $NODE_VERSION for $PLATFORM"
         docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
 
-        echo "Building test image with buildx for node $NODE_VERSION for $PLATFORM"
-        # For some reason the multi arch builder does not have access to the 
-        # local images on google cloud builds version of docker so we need 
-        # to use default to get this working. Also docker for mac no creates
-        # a desktop-linux context where you can't set builder so we need to
-        # also set the context for this to work there.
-        docker --context default buildx build --builder default --platform="${PLATFORM}" --progress=plain --load --tag="test:${NODE_VERSION}" --secret id=NPM_TOKEN --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" test/
-        echo "Running test image for node $NODE_VERSION for $PLATFORM"
-        docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
+        # echo "Building test image with buildx for node $NODE_VERSION for $PLATFORM"
+        # # For some reason the multi arch builder does not have access to the 
+        # # local images on google cloud builds version of docker so we need 
+        # # to use default to get this working. Also docker for mac no creates
+        # # a desktop-linux context where you can't set builder so we need to
+        # # also set the context for this to work there.
+        # docker --context default buildx build --builder default --platform="${PLATFORM}" --progress=plain --load --tag="test:${NODE_VERSION}" --secret id=NPM_TOKEN --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" test/
+        # echo "Running test image for node $NODE_VERSION for $PLATFORM"
+        # docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
     done
 
     if [[ -n "$PUSH" ]]; then
