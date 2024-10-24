@@ -26,7 +26,7 @@ secrets:
 Dockerfile:
 
 ```docker
-ARG NODE_VERSION=16.x
+ARG NODE_VERSION=stable
 
 FROM europe-west1-docker.pkg.dev/connectedcars-build/node-builder/master:$NODE_VERSION as builder
 
