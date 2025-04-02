@@ -93,6 +93,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
+        --cache-from="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_VERSION}" \
         $TAG_BASE_STABLE \
         .
 
@@ -101,6 +102,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
+        --cache-from="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_VERSION}" \
         $TAG_BUILDER_STABLE \
         .
 
@@ -109,6 +111,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
+        --cache-from="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_VERSION}" \
         $TAG_FAT_BASE_STABLE \
         .
     fi
