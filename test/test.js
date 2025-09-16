@@ -1,6 +1,6 @@
 const privateModule = require('@connectedcars/private-module')
 const expect = require('chai').expect;
-const { MySQLServer, MySQLClient } = require('@connectedcars/test')
+const { MySQLServer, MySQLClient } = require('@connectedcars/db-migrate')
 
 describe('test.js', () => {
   it('say Hello world', (done) => {

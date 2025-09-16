@@ -13,6 +13,7 @@
     "@connectedcars/private-module": "^0.0.3"
   },
   "devDependencies": {
+    "@connectedcars/db-migrate": "^1.0.1",
     "@connectedcars/test": "^0.22.0",
     "chai": "4.3.6",
     "mocha": "^10.0.0"
