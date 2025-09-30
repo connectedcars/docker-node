@@ -1,5 +1,7 @@
+ARG NODE_VERSION=22.0.0
+
 # Build fat base
-FROM base:${NODE_VERSION}
+FROM base:$NODE_VERSION
 
 USER root
 

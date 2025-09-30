@@ -31,11 +31,11 @@ ENV NO_COLOR=true
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # Copy over node
-COPY --from=downloader:$NODE_VERSION /opt/node-v$NODE_VERSION/ /usr/local
+COPY --from=downloader /opt/node-v$NODE_VERSION/ /usr/local
 RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
 # Copy over yarn
-COPY --from=downloader:$NODE_VERSION /opt/yarn-v$YARN_VERSION /usr/local
+COPY --from=downloader /opt/yarn-v$YARN_VERSION /usr/local
 
 # Disable npm color output and be less verbose
 RUN npm config set color false --global
