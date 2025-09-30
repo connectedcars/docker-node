@@ -1,0 +1,20 @@
+ARG NODE_VERSION=22.0.0
+
+FROM common
+
+ARG NODE_VERSION
+
+RUN echo "Building base image with node version: ${NODE_VERSION}"
+
+USER root
+
+# Create user for node
+RUN groupadd --gid 1001 node \
+  && useradd --uid 1001 --gid node --shell /bin/bash --create-home node
+RUN mkdir -p /app/tmp
+RUN chown node:node /app/tmp
+
+USER node
+
+ENV NODE_ENV production
+WORKDIR /app

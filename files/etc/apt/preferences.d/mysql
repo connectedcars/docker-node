@@ -1,3 +1,0 @@
-Package: mysql-server
-Pin: release n=bionic
-Pin-Priority: 1001

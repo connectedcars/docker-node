@@ -14,9 +14,11 @@ A363A499291CBBC940DD62E41F10027AF002F8B0"
 
 YARN_KEYS="6A010C5166006599AA17F08146C2130DFD2497F5"
 
+MYSQL_KEY="A8D3785C"
+
 rm -f *.gpg
 
-for key in $NODE_KEYS $YARN_KEYS; do
+for key in $NODE_KEYS $YARN_KEYS $MYSQL_KEY; do
     gpg -q --keyserver hkps://keys.openpgp.org --recv-keys "$key" || \
     gpg -q --keyserver hkp://keyserver.ubuntu.com --recv-keys "$key" || \
     gpg -q --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key"
