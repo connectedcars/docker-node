@@ -51,9 +51,6 @@ for NODE_VERSION in $NODE_VERSIONS; do
     
     # Build image cache for all platforms so it's ready
     echo "Building node $NODE_VERSION images for $BUILD_PLATFORMS";
-    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} --load -t "downloader" . -f Dockerfile.downloader;
-    ls -la
-    docker image ls
     docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} --load -t "common:${NODE_VERSION}" . -f Dockerfile.common;
     docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} -t "builder:${NODE_VERSION}" . -f Dockerfile.builder;
     docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} --load -t "base:${NODE_VERSION}" . -f Dockerfile.base;
