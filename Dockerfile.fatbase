@@ -1,5 +1,5 @@
 # Build fat base
-FROM base
+FROM base:${NODE_VERSION}
 
 USER root
 
