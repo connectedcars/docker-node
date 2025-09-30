@@ -51,18 +51,18 @@ for NODE_VERSION in $NODE_VERSIONS; do
     
     # Build image cache for all platforms so it's ready
     echo "Building node $NODE_VERSION images for $BUILD_PLATFORMS";
-    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} -f Dockerfile.downloader -t "downloader:${NODE_VERSION}" .
-    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} -f Dockerfile.common -t "common:${NODE_VERSION}" .
-    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} -f Dockerfile.buider -t "builder:${NODE_VERSION}" .
-    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} -f Dockerfile.base -t "base:${NODE_VERSION}" .
-    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} -f Dockerfile.fat-base -t "fat-base:${NODE_VERSION}" .
+    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} . -f Dockerfile.downloader -t "downloader:${NODE_VERSION}" .
+    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} . -f Dockerfile.common -t "common:${NODE_VERSION}" .
+    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} . -f Dockerfile.buider -t "builder:${NODE_VERSION}" .
+    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} . -f Dockerfile.base -t "base:${NODE_VERSION}" .
+    docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain ${DOCKER_NODE_BUILD_ARGS} . -f Dockerfile.fat-base -t "fat-base:${NODE_VERSION}" .
 
     # Build test images to see it work
     for PLATFORM in $BUILD_PLATFORMS; do
         echo "Load node $NODE_VERSION builder and base image into dockers image store for $PLATFORM"
-        docker buildx build --platform="${PLATFORM}" --progress=plain -f Dockerfile.base --load --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
-        docker buildx build --platform="${PLATFORM}" --progress=plain -f Dockerfile.builder --load --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
-        docker buildx build --platform="${PLATFORM}" --progress=plain -f Dockerfile.fat-base --load --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
+        docker buildx build --platform="${PLATFORM}" --progress=plain . -f Dockerfile.base --load --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
+        docker buildx build --platform="${PLATFORM}" --progress=plain . -f Dockerfile.builder --load --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
+        docker buildx build --platform="${PLATFORM}" --progress=plain . -f Dockerfile.fat-base --load --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_VERSION}" ${DOCKER_NODE_BUILD_ARGS} .
 
         # These builds are no longer necessary since we use buildx
         # echo "Building test image with old docker build for node $NODE_VERSION for $PLATFORM"
@@ -93,7 +93,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         fi
 
         echo Push base images
-        docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain -f Dockerfile.base ${DOCKER_NODE_BUILD_ARGS} --push \
+        docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain . -f Dockerfile.base ${DOCKER_NODE_BUILD_ARGS} --push \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
@@ -101,7 +101,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         .
 
         echo Push builder images
-        docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain -f Dockerfile.builder ${DOCKER_NODE_BUILD_ARGS} --push \
+        docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain . -f Dockerfile.builder ${DOCKER_NODE_BUILD_ARGS} --push \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
@@ -109,7 +109,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         .
 
         echo Push fat-base images
-        docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain -f Dockerfile.fat-base ${DOCKER_NODE_BUILD_ARGS} --push \
+        docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain . -f Dockerfile.fat-base ${DOCKER_NODE_BUILD_ARGS} --push \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_VERSION}-${COMMIT_SHA}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_VERSION}" \
         --tag="europe-west1-docker.pkg.dev/connectedcars-build/node-fat-base/${BRANCH_NAME}:${NODE_MAJOR_VERSION}.x" \
