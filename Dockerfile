@@ -26,6 +26,8 @@ RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
 	curl \
 	wget \
     xz-utils \
+	&& apt-get -y auto-clean \
+	&& apt-get -y clean \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /opt
@@ -80,6 +82,8 @@ ARG TARGETARCH
 RUN apt-get update -qq && \
 	apt-get dist-upgrade -qq -y --no-install-recommends && \
 	apt-get install -qq -y --no-install-recommends ca-certificates locales && \
+	apt-get -y auto-clean && \
+	apt-get -y clean && \
 	rm -rf /var/lib/apt/lists/*
 
 # Set UTF8 locals
@@ -114,26 +118,6 @@ RUN npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}' --global
 COPY --chown=root:root files/opt/connectedcars/bin /opt/connectedcars/bin
 ENV PATH /opt/connectedcars/bin:$PATH
 
-# Make sure we can install mysql-server from Ubuntu 18.04 as this is the last
-# version with mysql 5.7, also pin mysql-server to Ubuntu 18.04 as we have 
-# some repos that install it expecting mysql 5.7
-COPY --chown=root:root files/etc/apt/ /etc/apt/
-RUN if [ "${TARGETOS}/${TARGETARCH}" = "linux/amd64" ]; then \
-		echo Addding bionic for amd64 binaies; \
-		rm -f /etc/apt/sources.list.d/bionic-ports.list; \
-	elif [ "${TARGETOS}/${TARGETARCH}" = "linux/arm64" ]; then \
-		echo Addding bionic Downloading arm64 binaies; \
-		rm -f /etc/apt/sources.list.d/bionic.list; \
-	else \
-		echo "Unsupported target os and platform ${TARGETOS}/${TARGETARCH}"; \
-		exit 1; \
-	fi;
-
-# Install common libs from older ubuntu versions so most binaies would work
-RUN apt-get update -qq && \
-	apt-get install -qq -y --no-install-recommends libssl1.1 && \
-	rm -rf /var/lib/apt/lists/*
-
 # Work arround issues for older node versions:
 # https://github.com/nodejs/node/discussions/43184
 # https://nodejs.org/en/blog/vulnerability/july-2022-security-releases/#dll-hijacking-on-windows-high-cve-2022-32223
@@ -165,23 +149,24 @@ ARG NODE_VERSION
 
 RUN echo "Building builder image with node version: ${NODE_VERSION}"
 
+# make sure we can install mysql from official apt repository
+COPY --chown=root:root files/etc/apt/sources.list.d/mysql.sources /etc/apt/sources.list.d/
+
 # Install basic build tools
+# And install mysql 8.0 and 8.4 dependencies and download both versions to /opt
 RUN apt-get update -qq && \
-	apt-get install -qq -y --no-install-recommends build-essential python3 git openssh-client && \
-	rm -rf /var/lib/apt/lists/*
+  apt-get install -qq -y --no-install-recommends build-essential python3 git openssh-client mysql-community-client-core && \
+  apt-get install -qq -y --no-install-recommends $(apt-cache depends mysql-community-server-core=8.4* mysql-community-server-core=8.0* | grep Depends | sed "s/.*ends:\ //" | tr '\n' ' ') && \
+  apt-get download mysql-community-server-core=8.4* mysql-community-server-core=8.0* && \
+  dpkg-deb -x mysql-community-server-core_8.0*.deb /opt/mysql-8.0 && \
+  dpkg-deb -x mysql-community-server-core_8.4*.deb /opt/mysql-8.4 && \
+  rm -f mysql-community-server-core_*.deb && \
+  apt-get -y autoclean && \
+  apt-get -y clean && \
+  rm -rf /var/lib/apt/lists/*
 
-# Install mysql 5.7 and 8.x dependencies and download both versions to /opt
-RUN apt-get update -qq && \
-	apt-get install -qq -y --no-install-recommends mysql-client-core-8.0 && \
-	apt-get install -qq -y --no-install-recommends $(apt-cache depends mysql-server-core-5.7 mysql-server-core-8.0 | grep Depends | sed "s/.*ends:\ //" | tr '\n' ' ') && \
- 	apt-get download mysql-server-core-5.7 mysql-server-core-8.0 && \
- 	dpkg-deb -x mysql-server-core-5.7_*.deb /opt/mysql-5.7 && \
-	dpkg-deb -x mysql-server-core-8.0_*.deb /opt/mysql-8.0 && \
-	rm -f mysql-server-core-*.deb && \
-	rm -rf /var/lib/apt/lists/*
-
-# Set environment variables where you can find mysqld
-ENV MYSQLD_57=/opt/mysql-5.7/usr/sbin/mysqld
+## Set environment variables where you can find mysqld
+ENV MYSQLD_84=/opt/mysql-8.4/usr/sbin/mysqld
 ENV MYSQLD_80=/opt/mysql-8.0/usr/sbin/mysqld
 ENV MYSQLD=${MYSQLD_80}
 # Add mysql 8.0 to path so builds not using environment will still work
@@ -209,7 +194,9 @@ RUN apt-get update && apt-get -yq install openssh-client lftp \
 	libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 \
 	libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
 	ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget \
-	&& rm -rf /var/lib/apt/lists/*
+  && apt-get -y autoclean \
+  && apt-get -y clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # Add Semler external ftp to known hosts
 RUN mkdir -p /home/node/.ssh
