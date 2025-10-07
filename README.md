@@ -87,3 +87,8 @@ for NODE_VERSION in 18.7.0 16.16.0 14.20.0 12.22.12; do
   echo docker buildx imagetools create "europe-west1-docker.pkg.dev/connectedcars-build/node-builder/master:${NODE_VERSION}-${OLD_SHA}" --tag "europe-west1-docker.pkg.dev/connectedcars-build/node-builder/master:${NODE_MAJOR_VERSION}.x"
 done
 ```
+
+## MySQL apt repo key
+
+If the key for the MySQL repo has changed, `keys/A8D3785C.gpg`, then it needs to be reflected in `files/etc/apt/sources.list.d/mysql.sources` as well.
+Empty lines need to be appended with a dot (`.`).
