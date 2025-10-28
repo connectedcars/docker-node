@@ -35,5 +35,5 @@ Components: mysql-8.0 mysql-8.4-lts mysql-tools
 Signed-by:
 EOF
 
-cat "${MYSQL_KEY}.gpg" | sed s/^$/./ >> ../files/etc/apt/sources.list.d/mysql.sources
+cat "${MYSQL_KEY}.gpg" | sed s/^$/./ | sed 's/^/ /' >> ../files/etc/apt/sources.list.d/mysql.sources
 
