@@ -24,3 +24,16 @@ for key in $NODE_KEYS $YARN_KEYS $MYSQL_KEY; do
     gpg -q --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key"
     gpg --batch --yes --armor --output $key.gpg --export $key
 done
+
+cat > ../files/etc/apt/sources.list.d/mysql.sources<<EOF
+# Repository for MySQL databases based on the official documentation: https://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/#repo-qg-apt-repo-manual-setup
+# And this stackoverflow article on how to make proper source lists: https://stackoverflow.com/questions/68992799/warning-apt-key-is-deprecated-manage-keyring-files-in-trusted-gpg-d-instead
+Types: deb
+URIs: https://repo.mysql.com/apt/ubuntu/
+Suites: jammy
+Components: mysql-8.0 mysql-8.4-lts mysql-tools
+Signed-by:
+EOF
+
+cat "${MYSQL_KEY}.gpg" | sed s/^$/./ | sed 's/^/ /' >> ../files/etc/apt/sources.list.d/mysql.sources
+
