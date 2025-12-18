@@ -10,6 +10,7 @@ ARG NPM_VERSION
 ARG TARGETOS
 ARG TARGETARCH
 
+RUN echo "Break the image and fail..." && exit 1
 RUN echo "Building downloader image with node version: ${NODE_VERSION} for $TARGETOS/${TARGETARCH}"
 
 # Disable color output and be less verbose
