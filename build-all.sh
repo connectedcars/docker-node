@@ -3,7 +3,7 @@
 set -eux
 
 NODE_STABLE="22"
-NODE_VERSIONS=${NODE_VERSIONS:="24.12.0 22.21.1 20.19.6 18.20.8"}
+NODE_VERSIONS=${NODE_VERSIONS:="24.13.0 22.22.0 20.20.0 18.20.8"}
 YARN_VERSION=${YARN_VERSION:="1.22.19"}
 NPM_VERSION=${NPM_VERSION:="10.9.4"}
 # Disabled arm builds for now as they're only used locally
