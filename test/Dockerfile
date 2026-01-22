@@ -1,4 +1,4 @@
-ARG NODE_VERSION=16.x
+ARG NODE_VERSION=20.x
 ARG BRANCH_NAME=master
 
 FROM europe-west1-docker.pkg.dev/connectedcars-build/node-builder/$BRANCH_NAME:$NODE_VERSION as builder
