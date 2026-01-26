@@ -5,7 +5,7 @@ set -eux
 NODE_STABLE="24"
 NODE_VERSIONS=${NODE_VERSIONS:="24.13.0 22.22.0 20.20.0"}
 YARN_VERSION=${YARN_VERSION:="1.22.19"}
-NPM_VERSION=${NPM_VERSION:="10.9.4"}
+NPM_VERSION=${NPM_VERSION:="11.8.0"}
 # Disabled arm builds for now as they're only used locally
 BUILD_PLATFORMS=${BUILD_PLATFORMS:='linux/amd64'}
 # BUILD_PLATFORMS=${BUILD_PLATFORMS:='linux/amd64 linux/arm64'}
