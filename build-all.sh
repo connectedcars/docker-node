@@ -72,7 +72,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         # to use default to get this working. Also docker for mac no creates
         # a desktop-linux context where you can't set builder so we need to
         # also set the context for this to work there.
-        docker --context default buildx build --builder default --platform="${PLATFORM}" --progress=plain --pull --load --tag="test:${NODE_VERSION}" --secret id=NPM_TOKEN --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" test/
+        docker --context default buildx build --builder default --platform="${PLATFORM}" --progress=plain --load --tag="test:${NODE_VERSION}" --secret id=NPM_TOKEN --build-arg=NODE_VERSION="${NODE_VERSION}" --build-arg=BRANCH_NAME="${BRANCH_NAME}" test/
         echo "Running test image for node $NODE_VERSION for $PLATFORM"
         docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
     done
