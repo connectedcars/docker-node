@@ -17,7 +17,8 @@ ENV NO_COLOR=true
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # Install base dependencies
-RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
+RUN apt-get update
+RUN apt-get install -qq -y --no-install-recommends \
 	git \
 	openssh-client \
 	procps \
