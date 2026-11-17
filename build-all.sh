@@ -5,7 +5,7 @@ set -eux
 NODE_STABLE="24"
 NODE_VERSIONS=${NODE_VERSIONS:="24.22.3 22.23.5 20.20.2"}
 YARN_VERSION=${YARN_VERSION:="1.22.19"}
-NPM_VERSION=${NPM_VERSION:="11.8.0"}
+NPM_VERSION=${NPM_VERSION:="11.10.0"}
 # Disabled arm builds for now as they're only used locally
 BUILD_PLATFORMS=${BUILD_PLATFORMS:='linux/amd64'}
 # BUILD_PLATFORMS=${BUILD_PLATFORMS:='linux/amd64 linux/arm64'}
@@ -48,7 +48,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
     NODE_MAJOR_VERSION=$(echo "$NODE_VERSION" | cut -d. -f1)
 
     DOCKER_NODE_BUILD_ARGS="--build-arg=NODE_VERSION=${NODE_VERSION} --build-arg=NPM_VERSION=${NPM_VERSION} --build-arg=YARN_VERSION=${YARN_VERSION}"
-    
+
     # Build image cache for all platforms so it's ready
     echo "Building node $NODE_VERSION images for $BUILD_PLATFORMS";
     docker buildx build --platform="${DOCKER_PLATFORMS}" --progress=plain --pull ${DOCKER_NODE_BUILD_ARGS} .
@@ -67,8 +67,8 @@ for NODE_VERSION in $NODE_VERSIONS; do
         # docker run --platform="${PLATFORM}" "test:${NODE_VERSION}"
 
         echo "Building test image with buildx for node $NODE_VERSION for $PLATFORM"
-        # For some reason the multi arch builder does not have access to the 
-        # local images on google cloud builds version of docker so we need 
+        # For some reason the multi arch builder does not have access to the
+        # local images on google cloud builds version of docker so we need
         # to use default to get this working. Also docker for mac no creates
         # a desktop-linux context where you can't set builder so we need to
         # also set the context for this to work there.
@@ -81,7 +81,7 @@ for NODE_VERSION in $NODE_VERSIONS; do
         TAG_BASE_STABLE=""
         TAG_BUILDER_STABLE=""
         TAG_FAT_BASE_STABLE=""
-        echo  "$NODE_MAJOR_VERSION = $NODE_STABLE" 
+        echo  "$NODE_MAJOR_VERSION = $NODE_STABLE"
         if [ "$NODE_MAJOR_VERSION" = "$NODE_STABLE" ]; then
             TAG_BASE_STABLE="--tag=europe-west1-docker.pkg.dev/connectedcars-build/node-base/${BRANCH_NAME}:stable"
             TAG_BUILDER_STABLE="--tag=europe-west1-docker.pkg.dev/connectedcars-build/node-builder/${BRANCH_NAME}:stable"
